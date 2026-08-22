@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# g-track
 
-## Getting Started
+g-track is a developer activity tracking app. It pulls a developer's activity from GitHub (commits, pull requests, issues, and code reviews), normalizes it into a unified event model, and visualizes it as a dashboard with an activity heatmap and charts.
 
-First, run the development server:
+Sign-in is handled through GitHub OAuth. Each user's dashboard is private; only the marketing pages are public.
+
+## Status
+
+Early development. The project structure, documentation, and SEO foundation are in place. Authentication, GitHub sync, the database schema, and the dashboard are being built next.
+
+## Stack
+
+- [Next.js](https://nextjs.org) (App Router) with TypeScript
+- Tailwind CSS
+- Neon PostgreSQL with Drizzle ORM
+- Better Auth with GitHub OAuth
+- GitHub API via Octokit
+- Zod for validation at boundaries
+- Recharts for data visualization
+
+## Project structure
+
+| Directory | Purpose |
+|---|---|
+| `src/app/` | Routes, pages, and API handlers |
+| `src/components/` | Presentational UI and charts |
+| `src/lib/` | Shared utilities, auth config, GitHub client |
+| `src/db/` | Drizzle schema, migrations, and queries |
+| `src/types/` | Shared TypeScript types |
+| `docs/` | Architecture, workflow, and SEO documentation |
+
+## Getting started
+
+Requires Node.js 20 or later.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Other useful commands:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint     # run ESLint
+npm run build    # production build
+```
 
-## Learn More
+Environment variables go in `.env.local` (gitignored). `NEXT_PUBLIC_SITE_URL` should be set to the production URL when deployed; it falls back to `http://localhost:3000` locally.
 
-To learn more about Next.js, take a look at the following resources:
+## Documentation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): system design, layers, and data model
+- [docs/WORKFLOW.md](docs/WORKFLOW.md): how changes are planned, built, and reviewed
+- [docs/SEO.md](docs/SEO.md): SEO conventions and checklists
+- [AGENTS.md](AGENTS.md): project rules for AI coding agents
