@@ -1,0 +1,11 @@
+# g-track
+
+> g-track is a developer activity tracking app. It pulls a developer's activity from GitHub (commits, pull requests, issues, reviews), normalizes it into a unified event model, and visualizes it as a dashboard with an activity heatmap and charts.
+
+Sign-in is via GitHub OAuth. The dashboard is private to each user; only the marketing pages are public.
+
+## Features
+
+- GitHub activity sync: commits, pull requests, issues, and code reviews
+- Activity heatmap and per-day charts of a developer's work
+- Normalized event model designed to support more sources over time
