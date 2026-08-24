@@ -1,11 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Sora } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { site } from "@/lib/site";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sora = Sora({
   subsets: ["latin"],
+  variable: "--font-sora",
+  display: "swap",
+});
+
+const uncutSans = localFont({
+  src: [
+    { path: "./fonts/UncutSans-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/UncutSans-Medium.woff2", weight: "500", style: "normal" },
+  ],
+  variable: "--font-uncut-sans",
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -41,7 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${sora.variable} ${uncutSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

@@ -17,15 +17,15 @@ export default function OpenGraphImage() {
           alignItems: "center",
           justifyContent: "center",
           gap: 24,
-          background: "#09090b",
-          color: "#fafafa",
+          background: "#060a08",
+          color: "#f2f6f4",
           fontFamily: "sans-serif",
         }}
       >
         <div style={{ fontSize: 96, fontWeight: 700, letterSpacing: -2 }}>
           {site.name}
         </div>
-        <div style={{ fontSize: 32, color: "#a1a1aa" }}>
+        <div style={{ fontSize: 32, color: "#9db0a5" }}>
           developer activity tracking
         </div>
       </div>
