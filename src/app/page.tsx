@@ -1,3 +1,6 @@
+import { ContributionGraph } from "@/components/contribution-graph";
+import { FloatingIcons } from "@/components/floating-icons";
+import { SiteHeader } from "@/components/site-header";
 import { site } from "@/lib/site";
 
 const jsonLd = {
@@ -12,7 +15,10 @@ const jsonLd = {
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-6">
+    <>
+      <SiteHeader />
+      <div className="relative flex flex-1 flex-col items-center justify-center px-6">
+        <FloatingIcons />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -21,26 +27,15 @@ export default function Home() {
       />
       <main className="flex w-full max-w-2xl flex-col items-center gap-8 text-center">
         <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-          Track your developer activity, all in one place.
+          Every commit counts.
         </h1>
-        <p className="max-w-md text-lg leading-8 text-brand-300">
-          {site.description}
+        <p className="max-w-lg text-lg leading-8 text-brand-300">
+          Connect your GitHub and watch your activity light up the board.
+          Commits, PRs, issues, and reviews, all in one place.
         </p>
-        <div className="rounded-card border border-glass-border bg-glass p-8 backdrop-blur-xl">
-          <p className="text-sm text-brand-300">
-            Sign in with GitHub is coming next. This card is the glass surface
-            the dashboard will be built from.
-          </p>
-          <a
-            href="https://github.com/lianxxxx/g-track"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 inline-flex h-12 items-center justify-center rounded-full bg-accent-primary px-6 font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
-          >
-            View on GitHub
-          </a>
-        </div>
+        <ContributionGraph />
       </main>
-    </div>
+      </div>
+    </>
   );
 }

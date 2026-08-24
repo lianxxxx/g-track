@@ -37,11 +37,30 @@
 
   /* Radius */
   --radius-card: 1.25rem;
+
+  /* Motion */
+  --animate-float: float 7s ease-in-out infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
 }
 
 @layer base {
   :root {
     color-scheme: dark;
+    scrollbar-color: var(--color-brand-700) transparent;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-primary);
+    color: var(--color-brand-950);
   }
 
   body {
