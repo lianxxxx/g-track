@@ -1,6 +1,7 @@
 import { ContributionGraph } from "@/components/contribution-graph";
 import { FeaturesSection } from "@/components/features-section";
 import { FloatingIcons } from "@/components/floating-icons";
+import { HowItWorks } from "@/components/how-it-works";
 import { SiteHeader } from "@/components/site-header";
 import { site } from "@/lib/site";
 
@@ -40,6 +41,7 @@ export default function Home() {
           </div>
         </div>
         <FeaturesSection />
+        <HowItWorks />
       </main>
     </>
   );
