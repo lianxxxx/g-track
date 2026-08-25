@@ -27,7 +27,7 @@ const levels: number[] = Array.from({ length: WEEKS * DAYS }, () => {
 const total = levels.reduce((sum, level) => sum + level, 0) * 2;
 
 /* Sequential green ramp, dim -> bright on the dark surface (monotonic lightness). */
-const cellColor = [
+export const cellColor = [
   "bg-glass",
   "bg-[#0b3d22]",
   "bg-[#0a6b33]",
