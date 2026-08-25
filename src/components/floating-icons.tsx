@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
 
+import {
+  ActivityIcon,
+  CommitIcon,
+  iconStroke,
+  PullRequestIcon,
+} from "@/components/icons";
+
 type FloatingIcon = {
   label: string;
   position: string;
@@ -10,14 +17,6 @@ type FloatingIcon = {
   icon: ReactNode;
 };
 
-const stroke = {
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 1.75,
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-} as const;
-
 const icons: FloatingIcon[] = [
   {
     label: "Branches",
@@ -27,7 +26,7 @@ const icons: FloatingIcon[] = [
     delay: "0s",
     color: "text-brand-200",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" {...stroke} aria-hidden>
+      <svg viewBox="0 0 24 24" className="h-6 w-6" {...iconStroke} aria-hidden>
         <circle cx="6" cy="6" r="2.25" />
         <circle cx="6" cy="18" r="2.25" />
         <circle cx="18" cy="8" r="2.25" />
@@ -43,13 +42,7 @@ const icons: FloatingIcon[] = [
     rotate: "rotate-3",
     delay: "1.1s",
     color: "text-accent-primary",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" {...stroke} aria-hidden>
-        <circle cx="12" cy="12" r="3.25" />
-        <path d="M2.5 12h6.25" />
-        <path d="M15.25 12h6.25" />
-      </svg>
-    ),
+    icon: <CommitIcon className="h-5 w-5" />,
   },
   {
     label: "Stars",
@@ -59,7 +52,7 @@ const icons: FloatingIcon[] = [
     delay: "2.2s",
     color: "text-brand-200",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" {...stroke} aria-hidden>
+      <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" {...iconStroke} aria-hidden>
         <path d="M12 3.75l2.4 4.86 5.36.78-3.88 3.78.92 5.34L12 15.99l-4.8 2.52.92-5.34-3.88-3.78 5.36-.78L12 3.75z" />
       </svg>
     ),
@@ -71,16 +64,7 @@ const icons: FloatingIcon[] = [
     rotate: "rotate-6",
     delay: "0.6s",
     color: "text-brand-200",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" {...stroke} aria-hidden>
-        <circle cx="6" cy="5.5" r="2.25" />
-        <circle cx="6" cy="18.5" r="2.25" />
-        <circle cx="18" cy="18.5" r="2.25" />
-        <path d="M6 7.75v8.5" />
-        <path d="M12.5 5h3A2.5 2.5 0 0118 7.5v8.75" />
-        <path d="M14.75 2.75L12.5 5l2.25 2.25" />
-      </svg>
-    ),
+    icon: <PullRequestIcon className="h-6 w-6" />,
   },
   {
     label: "Code",
@@ -90,7 +74,7 @@ const icons: FloatingIcon[] = [
     delay: "1.7s",
     color: "text-brand-200",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" {...stroke} aria-hidden>
+      <svg viewBox="0 0 24 24" className="h-5 w-5" {...iconStroke} aria-hidden>
         <path d="M8.5 7.5L4 12l4.5 4.5" />
         <path d="M15.5 7.5L20 12l-4.5 4.5" />
       </svg>
@@ -103,14 +87,7 @@ const icons: FloatingIcon[] = [
     rotate: "rotate-3",
     delay: "2.8s",
     color: "text-accent-primary",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" {...stroke} aria-hidden>
-        <path d="M4.5 20v-5" />
-        <path d="M9.5 20V9.5" />
-        <path d="M14.5 20v-8" />
-        <path d="M19.5 20V4.5" />
-      </svg>
-    ),
+    icon: <ActivityIcon className="h-[22px] w-[22px]" />,
   },
 ];
 

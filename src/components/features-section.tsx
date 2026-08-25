@@ -1,14 +1,11 @@
 import type { ReactNode } from "react";
 
 import { cellColor } from "@/components/contribution-graph";
-
-const stroke = {
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 1.75,
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-} as const;
+import {
+  CommitIcon,
+  iconStroke,
+  PullRequestIcon,
+} from "@/components/icons";
 
 type FeedItem = {
   label: string;
@@ -22,35 +19,20 @@ const feedItems: FeedItem[] = [
     label: "Pushed 3 commits to g-track",
     meta: "2h ago",
     color: "text-accent-primary",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" {...stroke} aria-hidden>
-        <circle cx="12" cy="12" r="3.25" />
-        <path d="M2.5 12h6.25" />
-        <path d="M15.25 12h6.25" />
-      </svg>
-    ),
+    icon: <CommitIcon className="h-4 w-4" />,
   },
   {
     label: "Merged #128 · activity sync",
     meta: "yesterday",
     color: "text-brand-200",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" {...stroke} aria-hidden>
-        <circle cx="6" cy="5.5" r="2.25" />
-        <circle cx="6" cy="18.5" r="2.25" />
-        <circle cx="18" cy="18.5" r="2.25" />
-        <path d="M6 7.75v8.5" />
-        <path d="M12.5 5h3A2.5 2.5 0 0118 7.5v8.75" />
-        <path d="M14.75 2.75L12.5 5l2.25 2.25" />
-      </svg>
-    ),
+    icon: <PullRequestIcon className="h-4 w-4" />,
   },
   {
     label: "Reviewed #124 · heatmap colors",
     meta: "yesterday",
     color: "text-brand-200",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" {...stroke} aria-hidden>
+      <svg viewBox="0 0 24 24" className="h-4 w-4" {...iconStroke} aria-hidden>
         <path d="M12 5.25c-4.5 0-7.6 3.6-8.75 6.75C4.4 15.15 7.5 18.75 12 18.75s7.6-3.6 8.75-6.75C19.6 8.85 16.5 5.25 12 5.25z" />
         <circle cx="12" cy="12" r="2.75" />
       </svg>
@@ -61,7 +43,7 @@ const feedItems: FeedItem[] = [
     meta: "2d ago",
     color: "text-brand-200",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" {...stroke} aria-hidden>
+      <svg viewBox="0 0 24 24" className="h-4 w-4" {...iconStroke} aria-hidden>
         <circle cx="12" cy="12" r="8.25" />
         <circle cx="12" cy="12" r="1" fill="currentColor" />
       </svg>
@@ -175,7 +157,7 @@ export function FeaturesSection() {
               aria-hidden
               className="mt-6 flex h-11 w-11 items-center justify-center rounded-xl border border-glass-border bg-glass text-accent-primary"
             >
-              <svg viewBox="0 0 24 24" className="h-5 w-5" {...stroke} aria-hidden>
+              <svg viewBox="0 0 24 24" className="h-5 w-5" {...iconStroke} aria-hidden>
                 <path d="M9.5 14.5L4.75 19.25" />
                 <path d="M13.75 3.75l6.5 6.5-3 3-6.5-6.5 3-3z" />
                 <path d="M8.5 8.5l7 7" />
