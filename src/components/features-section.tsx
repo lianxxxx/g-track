@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
+import {
+  FiAlertCircle,
+  FiEye,
+  FiGitCommit,
+  FiGitMerge,
+  FiLink,
+} from "react-icons/fi";
 
 import { cellColor } from "@/components/contribution-graph";
-import {
-  CommitIcon,
-  iconStroke,
-  PullRequestIcon,
-} from "@/components/icons";
 
 type FeedItem = {
   label: string;
@@ -19,35 +21,25 @@ const feedItems: FeedItem[] = [
     label: "Pushed 3 commits to g-track",
     meta: "2h ago",
     color: "text-accent-primary",
-    icon: <CommitIcon className="h-4 w-4" />,
+    icon: <FiGitCommit className="h-4 w-4" strokeWidth={1.75} aria-hidden />,
   },
   {
     label: "Merged #128 · activity sync",
     meta: "yesterday",
     color: "text-brand-200",
-    icon: <PullRequestIcon className="h-4 w-4" />,
+    icon: <FiGitMerge className="h-4 w-4" strokeWidth={1.75} aria-hidden />,
   },
   {
     label: "Reviewed #124 · heatmap colors",
     meta: "yesterday",
     color: "text-brand-200",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" {...iconStroke} aria-hidden>
-        <path d="M12 5.25c-4.5 0-7.6 3.6-8.75 6.75C4.4 15.15 7.5 18.75 12 18.75s7.6-3.6 8.75-6.75C19.6 8.85 16.5 5.25 12 5.25z" />
-        <circle cx="12" cy="12" r="2.75" />
-      </svg>
-    ),
+    icon: <FiEye className="h-4 w-4" strokeWidth={1.75} aria-hidden />,
   },
   {
     label: "Opened issue · streak badge",
     meta: "2d ago",
     color: "text-brand-200",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-4 w-4" {...iconStroke} aria-hidden>
-        <circle cx="12" cy="12" r="8.25" />
-        <circle cx="12" cy="12" r="1" fill="currentColor" />
-      </svg>
-    ),
+    icon: <FiAlertCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden />,
   },
 ];
 
@@ -157,13 +149,7 @@ export function FeaturesSection() {
               aria-hidden
               className="mt-6 flex h-11 w-11 items-center justify-center rounded-xl border border-glass-border bg-glass text-accent-primary"
             >
-              <svg viewBox="0 0 24 24" className="h-5 w-5" {...iconStroke} aria-hidden>
-                <path d="M9.5 14.5L4.75 19.25" />
-                <path d="M13.75 3.75l6.5 6.5-3 3-6.5-6.5 3-3z" />
-                <path d="M8.5 8.5l7 7" />
-                <path d="M15.5 12.25l2.25 2.25" />
-                <path d="M9.5 6.25L11.75 8.5" />
-              </svg>
+              <FiLink className="h-5 w-5" strokeWidth={1.75} aria-hidden />
             </span>
           </article>
 

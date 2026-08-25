@@ -1,3 +1,5 @@
+import { FiPlus } from "react-icons/fi";
+
 /** Single source for the FAQ content; page.tsx derives FAQPage JSON-LD from it. */
 export const faqs = [
   {
@@ -50,18 +52,11 @@ export function FaqSection() {
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-md text-left font-medium text-brand-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-primary [&::-webkit-details-marker]:hidden">
                 {faq.question}
-                <svg
-                  viewBox="0 0 24 24"
+                <FiPlus
                   className="h-4 w-4 shrink-0 text-brand-300 transition-transform duration-200 group-open:rotate-45"
-                  fill="none"
-                  stroke="currentColor"
                   strokeWidth={1.75}
-                  strokeLinecap="round"
                   aria-hidden
-                >
-                  <path d="M12 5v14" />
-                  <path d="M5 12h14" />
-                </svg>
+                />
               </summary>
               <p className="mt-3 max-w-xl leading-7 text-brand-300">
                 {faq.answer}

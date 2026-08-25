@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
-
 import {
-  ActivityIcon,
-  CommitIcon,
-  iconStroke,
-  PullRequestIcon,
-} from "@/components/icons";
+  FiBarChart2,
+  FiCode,
+  FiGitBranch,
+  FiGitCommit,
+  FiGitPullRequest,
+  FiStar,
+} from "react-icons/fi";
 
 type FloatingIcon = {
   label: string;
@@ -25,15 +26,7 @@ const icons: FloatingIcon[] = [
     rotate: "-rotate-6",
     delay: "0s",
     color: "text-brand-200",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" {...iconStroke} aria-hidden>
-        <circle cx="6" cy="6" r="2.25" />
-        <circle cx="6" cy="18" r="2.25" />
-        <circle cx="18" cy="8" r="2.25" />
-        <path d="M6 8.25v7.5" />
-        <path d="M18 10.25c0 3.2-2.6 4.75-6 4.75" />
-      </svg>
-    ),
+    icon: <FiGitBranch className="h-6 w-6" strokeWidth={1.75} aria-hidden />,
   },
   {
     label: "Commits",
@@ -42,7 +35,7 @@ const icons: FloatingIcon[] = [
     rotate: "rotate-3",
     delay: "1.1s",
     color: "text-accent-primary",
-    icon: <CommitIcon className="h-5 w-5" />,
+    icon: <FiGitCommit className="h-5 w-5" strokeWidth={1.75} aria-hidden />,
   },
   {
     label: "Stars",
@@ -52,9 +45,7 @@ const icons: FloatingIcon[] = [
     delay: "2.2s",
     color: "text-brand-200",
     icon: (
-      <svg viewBox="0 0 24 24" className="h-[22px] w-[22px]" {...iconStroke} aria-hidden>
-        <path d="M12 3.75l2.4 4.86 5.36.78-3.88 3.78.92 5.34L12 15.99l-4.8 2.52.92-5.34-3.88-3.78 5.36-.78L12 3.75z" />
-      </svg>
+      <FiStar className="h-[22px] w-[22px]" strokeWidth={1.75} aria-hidden />
     ),
   },
   {
@@ -64,7 +55,9 @@ const icons: FloatingIcon[] = [
     rotate: "rotate-6",
     delay: "0.6s",
     color: "text-brand-200",
-    icon: <PullRequestIcon className="h-6 w-6" />,
+    icon: (
+      <FiGitPullRequest className="h-6 w-6" strokeWidth={1.75} aria-hidden />
+    ),
   },
   {
     label: "Code",
@@ -73,12 +66,7 @@ const icons: FloatingIcon[] = [
     rotate: "-rotate-3",
     delay: "1.7s",
     color: "text-brand-200",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" {...iconStroke} aria-hidden>
-        <path d="M8.5 7.5L4 12l4.5 4.5" />
-        <path d="M15.5 7.5L20 12l-4.5 4.5" />
-      </svg>
-    ),
+    icon: <FiCode className="h-5 w-5" strokeWidth={1.75} aria-hidden />,
   },
   {
     label: "Activity",
@@ -87,7 +75,13 @@ const icons: FloatingIcon[] = [
     rotate: "rotate-3",
     delay: "2.8s",
     color: "text-accent-primary",
-    icon: <ActivityIcon className="h-[22px] w-[22px]" />,
+    icon: (
+      <FiBarChart2
+        className="h-[22px] w-[22px]"
+        strokeWidth={1.75}
+        aria-hidden
+      />
+    ),
   },
 ];
 

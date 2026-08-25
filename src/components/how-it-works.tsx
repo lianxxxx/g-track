@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-
-import { ActivityIcon, iconStroke } from "@/components/icons";
+import { FiBarChart2, FiRefreshCw, FiUser } from "react-icons/fi";
 
 type Step = {
   title: string;
@@ -14,31 +13,19 @@ const steps: Step[] = [
     title: "Sign in with GitHub",
     body: "One OAuth authorization, straight from the browser. No tokens to paste, nothing to install.",
     color: "text-brand-200",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" {...iconStroke} aria-hidden>
-        <circle cx="12" cy="8.5" r="3.75" />
-        <path d="M5.25 19.5c1.4-2.9 3.9-4.25 6.75-4.25s5.35 1.35 6.75 4.25" />
-      </svg>
-    ),
+    icon: <FiUser className="h-5 w-5" strokeWidth={1.75} aria-hidden />,
   },
   {
     title: "g-track syncs your activity",
     body: "Commits, pull requests, issues, and reviews are pulled through the GitHub API and normalized into a single event stream.",
     color: "text-brand-200",
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5" {...iconStroke} aria-hidden>
-        <path d="M19.25 12a7.25 7.25 0 01-12.7 4.8" />
-        <path d="M4.75 12a7.25 7.25 0 0112.7-4.8" />
-        <path d="M19.25 4.5v2.9h-2.9" />
-        <path d="M4.75 19.5v-2.9h2.9" />
-      </svg>
-    ),
+    icon: <FiRefreshCw className="h-5 w-5" strokeWidth={1.75} aria-hidden />,
   },
   {
     title: "Your board lights up",
     body: "The heatmap and charts are built from your daily activity, and keep filling in as you work.",
     color: "text-accent-primary",
-    icon: <ActivityIcon className="h-5 w-5" />,
+    icon: <FiBarChart2 className="h-5 w-5" strokeWidth={1.75} aria-hidden />,
   },
 ];
 
