@@ -105,7 +105,7 @@ export function FeaturesSection() {
         >
           Built to make your work visible
         </h2>
-        <p className="mt-4 max-w-xl text-lg leading-8 text-brand-300">
+        <p className="mt-4 max-w-xl text-pretty text-lg leading-8 text-brand-300">
           g-track turns scattered GitHub activity into one board you can
           actually read.
         </p>
@@ -142,7 +142,7 @@ export function FeaturesSection() {
             </ul>
           </article>
 
-          <article className={`${card} md:col-span-2`}>
+          <article className={`${card} flex flex-col md:col-span-2`}>
             <h3 className="text-lg font-semibold text-brand-50">
               A year on one board
             </h3>
@@ -152,7 +152,7 @@ export function FeaturesSection() {
             </p>
             <div
               aria-hidden
-              className="mt-6 grid w-fit max-w-full grid-flow-col grid-rows-7 gap-[3px] overflow-hidden"
+              className="mt-auto grid w-fit max-w-full grid-flow-col grid-rows-7 gap-[3px] overflow-hidden pt-6"
             >
               {miniLevels.map((level, index) => (
                 <span
@@ -175,7 +175,7 @@ export function FeaturesSection() {
               aria-hidden
               className="mt-6 flex h-11 w-11 items-center justify-center rounded-xl border border-glass-border bg-glass text-accent-primary"
             >
-              <svg viewBox="0 0 24 24" className="h-5 w-5" {...stroke}>
+              <svg viewBox="0 0 24 24" className="h-5 w-5" {...stroke} aria-hidden>
                 <path d="M9.5 14.5L4.75 19.25" />
                 <path d="M13.75 3.75l6.5 6.5-3 3-6.5-6.5 3-3z" />
                 <path d="M8.5 8.5l7 7" />
