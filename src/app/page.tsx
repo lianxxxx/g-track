@@ -3,6 +3,7 @@ import { FaqSection, faqs } from "@/components/faq-section";
 import { FeaturesSection } from "@/components/features-section";
 import { FloatingIcons } from "@/components/floating-icons";
 import { HowItWorks } from "@/components/how-it-works";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { site } from "@/lib/site";
 
@@ -61,6 +62,7 @@ export default function Home() {
         <HowItWorks />
         <FaqSection />
       </main>
+      <SiteFooter />
     </>
   );
 }
