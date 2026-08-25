@@ -1,4 +1,5 @@
 import { ContributionGraph } from "@/components/contribution-graph";
+import { FaqSection, faqs } from "@/components/faq-section";
 import { FeaturesSection } from "@/components/features-section";
 import { FloatingIcons } from "@/components/floating-icons";
 import { HowItWorks } from "@/components/how-it-works";
@@ -15,6 +16,16 @@ const jsonLd = {
   operatingSystem: "Web",
 };
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: { "@type": "Answer", text: faq.answer },
+  })),
+};
+
 export default function Home() {
   return (
     <>
@@ -23,6 +34,12 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c"),
         }}
       />
       <main className="flex-1">
@@ -42,6 +59,7 @@ export default function Home() {
         </div>
         <FeaturesSection />
         <HowItWorks />
+        <FaqSection />
       </main>
     </>
   );
