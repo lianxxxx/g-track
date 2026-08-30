@@ -1,7 +1,7 @@
 import { ContributionGraph } from "@/components/contribution-graph";
 import { FaqSection, faqs } from "@/components/faq-section";
 import { FeaturesSection } from "@/components/features-section";
-import { FloatingIcons } from "@/components/floating-icons";
+import { ActivityPillRow, FloatingIcons } from "@/components/floating-icons";
 import { HowItWorks } from "@/components/how-it-works";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -60,6 +60,7 @@ export default function Home() {
               Commits, PRs, issues, and reviews, all in one place.
             </p>
             <ContributionGraph />
+            <ActivityPillRow className="md:hidden" />
           </div>
         </div>
         <FeaturesSection />

@@ -132,6 +132,25 @@ function Fragment({ item }: { item: FloatingItem }) {
   );
 }
 
+/** The same activity pills as a wrapping row, for small screens where floating placement has no room. */
+export function ActivityPillRow({ className = "" }: { className?: string }) {
+  return (
+    <div
+      aria-hidden
+      className={`-mt-3 flex flex-wrap justify-center gap-x-3 gap-y-4 px-2 ${className}`}
+    >
+      {items.map((item, index) => (
+        <span
+          key={item.label}
+          className={`${item.rotate} ${index % 2 === 0 ? "translate-y-1" : "-translate-y-1"}`}
+        >
+          <Fragment item={item} />
+        </span>
+      ))}
+    </div>
+  );
+}
+
 /** Decorative GitHub activity scattered around the hero. Static; hidden on small screens. */
 export function FloatingIcons({ variant = 2 }: { variant?: FloatingVariant }) {
   return (
