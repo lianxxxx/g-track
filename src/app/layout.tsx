@@ -48,12 +48,19 @@ export const metadata: Metadata = {
   },
 };
 
+/* Runs before first paint so a stored light theme doesn't flash dark. Dark is the default. */
+const themeInitScript = `try{if(localStorage.getItem("g-track-theme")==="light")document.documentElement.dataset.theme="light"}catch{}`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
       className={`${sora.variable} ${uncutSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

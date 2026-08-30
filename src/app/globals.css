@@ -1,29 +1,103 @@
 @import "tailwindcss";
 
+/* Light theme is opt-in via data-theme="light" on <html> (set by the theme toggle). */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
+/* Raw palette per theme. Utilities reference these through @theme inline below,
+   so swapping data-theme re-colors every existing brand-* / glass / accent class. */
+:root {
+  color-scheme: dark;
+
+  /* Neutrals - green-tinted dark ramp (brand-*).
+     Small text on glass surfaces: use brand-300 or lighter (AA contrast);
+     brand-400 is for large or decorative text only. */
+  --brand-950: #060a08;
+  --brand-900: #0b120e;
+  --brand-800: #141d18;
+  --brand-700: #1f2b24;
+  --brand-600: #32423a;
+  --brand-500: #4d6156;
+  --brand-400: #708579;
+  --brand-300: #9db0a5;
+  --brand-200: #c4d1c9;
+  --brand-100: #e2e9e5;
+  --brand-50: #f2f6f4;
+
+  /* Accent - actions only */
+  --accent-primary: #08a045;
+  --accent-primary-hover: #0cc255;
+
+  /* Glass surfaces */
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  /* GitHub event types (charts, chips, decorative tiles) */
+  --event-commit: #08a045;
+  --event-pr: #a371f7;
+  --event-branch: #58a6ff;
+  --event-star: #e3b341;
+  --event-review: #39d2c0;
+
+  /* Heatmap levels below the accent (level 0 is the empty cell) */
+  --heat-0: rgba(255, 255, 255, 0.05);
+  --heat-1: #0b3d22;
+  --heat-2: #0a6b33;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Same ramp, flipped: brand-950 is the page background, brand-50 the foreground. */
+  --brand-950: #ffffff;
+  --brand-900: #e9efeb;
+  --brand-800: #d7e0da;
+  --brand-700: #bfcbc4;
+  --brand-600: #9fb0a7;
+  --brand-500: #6b7d73;
+  --brand-400: #5a6c62;
+  --brand-300: #46564d;
+  --brand-200: #2b3830;
+  --brand-100: #1a241e;
+  --brand-50: #0b120e;
+
+  /* Slightly deeper green so light button text stays AA; hover darkens. */
+  --accent-primary: #05833a;
+  --accent-primary-hover: #046a2e;
+
+  --glass: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.08);
+
+  --event-commit: #05833a;
+  --event-pr: #8250df;
+  --event-branch: #0969da;
+  --event-star: #b8860b;
+  --event-review: #0f8f80;
+
+  --heat-0: rgba(0, 0, 0, 0.05);
+  --heat-1: #bde8cc;
+  --heat-2: #6fd097;
+}
+
 @theme inline {
   /* Fonts (loaded via next/font in layout.tsx) */
   --font-sans: var(--font-uncut-sans), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  /* Neutrals - green-tinted dark ramp (brand-*).
-     Small text on glass surfaces: use brand-300 or lighter (AA contrast);
-     brand-400 is for large or decorative text only. */
-  --color-brand-950: #060a08;
-  --color-brand-900: #0b120e;
-  --color-brand-800: #141d18;
-  --color-brand-700: #1f2b24;
-  --color-brand-600: #32423a;
-  --color-brand-500: #4d6156;
-  --color-brand-400: #708579;
-  --color-brand-300: #9db0a5;
-  --color-brand-200: #c4d1c9;
-  --color-brand-100: #e2e9e5;
-  --color-brand-50: #f2f6f4;
+  --color-brand-950: var(--brand-950);
+  --color-brand-900: var(--brand-900);
+  --color-brand-800: var(--brand-800);
+  --color-brand-700: var(--brand-700);
+  --color-brand-600: var(--brand-600);
+  --color-brand-500: var(--brand-500);
+  --color-brand-400: var(--brand-400);
+  --color-brand-300: var(--brand-300);
+  --color-brand-200: var(--brand-200);
+  --color-brand-100: var(--brand-100);
+  --color-brand-50: var(--brand-50);
 
-  /* Accent - actions only */
-  --color-accent-primary: #08a045;
-  --color-accent-primary-hover: #0cc255;
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-primary-hover: var(--accent-primary-hover);
   --color-accent-primary-soft: rgba(8, 160, 69, 0.12);
 
   /* State - validation/feedback only */
@@ -31,29 +105,33 @@
   --color-state-error: #e5484d;
   --color-state-warning: #f0b429;
 
-  /* Glass surfaces */
-  --color-glass: rgba(255, 255, 255, 0.05);
-  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
 
-  /* GitHub event types (charts, chips, decorative tiles) */
-  --color-event-commit: #08a045;
-  --color-event-pr: #a371f7;
-  --color-event-branch: #58a6ff;
-  --color-event-star: #e3b341;
-  --color-event-review: #39d2c0;
+  --color-event-commit: var(--event-commit);
+  --color-event-pr: var(--event-pr);
+  --color-event-branch: var(--event-branch);
+  --color-event-star: var(--event-star);
+  --color-event-review: var(--event-review);
 
-  /* Heatmap levels below the accent (level 0 is the empty cell) */
-  --color-heat-0: rgba(255, 255, 255, 0.05);
-  --color-heat-1: #0b3d22;
-  --color-heat-2: #0a6b33;
+  --color-heat-0: var(--heat-0);
+  --color-heat-1: var(--heat-1);
+  --color-heat-2: var(--heat-2);
 
   /* Radius */
   --radius-card: 1.25rem;
 }
 
+/* Theme switch: the toggle animates ::view-transition-new(root) with a clip-path circle
+   (see src/components/theme-toggle.tsx). Turn off the default cross-fade so only that reveal runs. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 @layer base {
   :root {
-    color-scheme: dark;
     scrollbar-color: var(--color-brand-700) transparent;
   }
 

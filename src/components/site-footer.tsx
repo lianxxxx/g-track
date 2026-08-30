@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { site } from "@/lib/site";
 
 const footerLinks = [
@@ -18,12 +18,7 @@ export function SiteFooter() {
             href="/"
             className="flex w-fit items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-primary"
           >
-            <Image
-              src="/brand/logo-wordmark-dark.png"
-              alt="g-track"
-              width={88}
-              height={32}
-            />
+            <BrandLogo />
           </Link>
           <p className="text-sm text-brand-300">Every commit counts.</p>
         </div>

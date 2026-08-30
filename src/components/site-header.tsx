@@ -1,8 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+
+import { BrandLogo } from "@/components/brand-logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
   { label: "Features", href: "#features" },
@@ -29,13 +31,7 @@ export function SiteHeader() {
           href="/"
           className="flex w-fit items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-primary"
         >
-          <Image
-            src="/brand/logo-wordmark-dark.png"
-            alt="g-track"
-            width={88}
-            height={32}
-            priority
-          />
+          <BrandLogo priority />
         </Link>
 
         <nav
@@ -54,6 +50,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="col-start-3 flex items-center justify-end gap-3">
+          <ThemeToggle />
           <a
             href="#"
             className="hidden h-10 items-center rounded-full border border-glass-border px-5 text-sm font-medium text-brand-100 transition-colors hover:border-brand-600 hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary md:flex"
@@ -88,7 +85,7 @@ export function SiteHeader() {
         {menuOpen && (
           <div
             id="mobile-menu"
-            className="absolute inset-x-4 top-[4.25rem] rounded-card border border-glass-border bg-brand-900/95 p-3 backdrop-blur-xl md:hidden"
+            className="absolute inset-x-4 top-[4.25rem] rounded-card border border-glass-border bg-brand-900/95 p-3 backdrop-blur-xl light:bg-brand-950/95 md:hidden"
           >
             <nav aria-label="Main" className="flex flex-col">
               {navLinks.map((link) => (
