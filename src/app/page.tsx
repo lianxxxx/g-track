@@ -5,6 +5,7 @@ import { FloatingIcons } from "@/components/floating-icons";
 import { HowItWorks } from "@/components/how-it-works";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SplashScreen } from "@/components/splash-screen";
 import { site } from "@/lib/site";
 
 const jsonLd = {
@@ -30,6 +31,7 @@ const faqJsonLd = {
 export default function Home() {
   return (
     <>
+      <SplashScreen />
       <SiteHeader />
       <script
         type="application/ld+json"
