@@ -35,21 +35,20 @@
   --color-glass: rgba(255, 255, 255, 0.05);
   --color-glass-border: rgba(255, 255, 255, 0.1);
 
+  /* GitHub event types (charts, chips, decorative tiles) */
+  --color-event-commit: #08a045;
+  --color-event-pr: #a371f7;
+  --color-event-branch: #58a6ff;
+  --color-event-star: #e3b341;
+  --color-event-review: #39d2c0;
+
+  /* Heatmap levels below the accent (level 0 is the empty cell) */
+  --color-heat-0: rgba(255, 255, 255, 0.05);
+  --color-heat-1: #0b3d22;
+  --color-heat-2: #0a6b33;
+
   /* Radius */
   --radius-card: 1.25rem;
-
-  /* Motion */
-  --animate-float: float 7s ease-in-out infinite;
-
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
 }
 
 @layer base {
