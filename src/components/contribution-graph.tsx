@@ -131,7 +131,7 @@ export function ContributionGraph() {
             ))}
           </div>
 
-          <div className={`grid grid-flow-col grid-rows-7 ${columns} ${cellGap}`}>
+          <div className={`col-start-2 grid grid-flow-col grid-rows-7 ${columns} ${cellGap}`}>
             {levels.map((level, index) => (
               <span
                 key={index}
