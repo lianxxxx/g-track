@@ -24,7 +24,8 @@ export function BrandLogo({ priority = false }: { priority?: boolean }) {
   );
 }
 
-/** Square "g" mark, same theme swap as the wordmark. Both assets are 512x512. */
+/** Square "g" mark, same theme swap as the wordmark. Both assets are 512x512.
+ *  Both variants preload: the mark only appears on the splash, where a late image would be visible. */
 export function BrandMark({ size = 64 }: { size?: number }) {
   return (
     <>
@@ -41,6 +42,7 @@ export function BrandMark({ size = 64 }: { size?: number }) {
         alt="g-track"
         width={size}
         height={size}
+        priority
         className="hidden light:block"
       />
     </>
