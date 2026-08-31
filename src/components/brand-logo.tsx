@@ -25,12 +25,14 @@ export function BrandLogo({ priority = false }: { priority?: boolean }) {
 }
 
 /** Square "g" mark, same theme swap as the wordmark. Both assets are 512x512.
+ *  The -v2 suffix is a cache buster: next/image keys its ETag on the URL, so a replaced file
+ *  with the same name is served as 304 to returning browsers. Bump the filename when the asset changes.
  *  Both variants preload: the mark only appears on the splash, where a late image would be visible. */
 export function BrandMark({ size = 64 }: { size?: number }) {
   return (
     <>
       <Image
-        src="/brand/logo-mark-dark.webp"
+        src="/brand/logo-mark-dark-v2.webp"
         alt="g-track"
         width={size}
         height={size}
@@ -38,7 +40,7 @@ export function BrandMark({ size = 64 }: { size?: number }) {
         className="light:hidden"
       />
       <Image
-        src="/brand/logo-mark-light.webp"
+        src="/brand/logo-mark-light-v2.webp"
         alt="g-track"
         width={size}
         height={size}
