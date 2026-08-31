@@ -7,7 +7,13 @@ import { authClient } from "@/lib/auth-client";
 
 /** Starts the GitHub OAuth flow. On success the browser leaves for GitHub, so
  *  the pending state only needs to cover the round trip to our own API. */
-export function GitHubSignInButton() {
+type Props = {
+  label: string;
+  /** Where Better Auth sends the browser when GitHub returns an error (it appends ?error=...). */
+  errorCallbackURL: string;
+};
+
+export function GitHubSignInButton({ label, errorCallbackURL }: Props) {
   const [pending, setPending] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -27,8 +33,7 @@ export function GitHubSignInButton() {
     const { error } = await authClient.signIn.social({
       provider: "github",
       callbackURL: "/dashboard",
-      // Better Auth appends ?error=...&error_description=... itself.
-      errorCallbackURL: "/login",
+      errorCallbackURL,
     });
     if (error) {
       setFailed(true);
@@ -45,7 +50,7 @@ export function GitHubSignInButton() {
         className="flex h-12 w-full items-center justify-center gap-2.5 rounded-full bg-accent-primary text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary disabled:cursor-wait disabled:opacity-70"
       >
         <FiGithub className="h-5 w-5" strokeWidth={1.75} aria-hidden />
-        {pending ? "Heading to GitHub" : "Continue with GitHub"}
+        {pending ? "Heading to GitHub" : label}
       </button>
       {failed && (
         <p role="alert" className="text-sm text-state-error">

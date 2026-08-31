@@ -20,7 +20,7 @@ export function SiteFooter() {
 
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           <Link
-            href="/login"
+            href="/signup"
             className="flex h-11 items-center rounded-full bg-accent-primary px-6 text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
           >
             Sign up

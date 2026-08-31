@@ -58,7 +58,7 @@ export function SiteHeader() {
             Log in
           </Link>
           <Link
-            href="/login"
+            href="/signup"
             className="hidden h-10 items-center rounded-full bg-accent-primary px-5 text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary md:flex"
           >
             Sign up
@@ -107,7 +107,7 @@ export function SiteHeader() {
                 Log in
               </Link>
               <Link
-                href="/login"
+                href="/signup"
                 className="flex h-11 items-center justify-center rounded-full bg-accent-primary text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
               >
                 Sign up
