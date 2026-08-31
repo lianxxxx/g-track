@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
+import { FiBarChart2, FiCheck, FiRefreshCw } from "react-icons/fi";
 
 import { BrandLogo } from "@/components/brand-logo";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -13,7 +15,55 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/** Placeholder shell for the signed-in area. The board itself arrives with GitHub sync. */
+type Status = "done" | "building" | "next";
+
+type Step = {
+  title: string;
+  body: string;
+  status: Status;
+  icon: ReactNode;
+};
+
+const steps: Step[] = [
+  {
+    title: "Sign in",
+    body: "Done. Your GitHub account is linked.",
+    status: "done",
+    icon: <FiCheck className="h-5 w-5" strokeWidth={2} aria-hidden />,
+  },
+  {
+    title: "Sync",
+    body: "Being built. Commits, PRs, issues, and reviews will land here.",
+    status: "building",
+    icon: <FiRefreshCw className="h-5 w-5" strokeWidth={1.75} aria-hidden />,
+  },
+  {
+    title: "Slay",
+    body: "Up next. Your board: heatmap, feed, and insights from real activity.",
+    status: "next",
+    icon: <FiBarChart2 className="h-5 w-5" strokeWidth={1.75} aria-hidden />,
+  },
+];
+
+const statusLabel: Record<Status, string> = {
+  done: "Done",
+  building: "In progress",
+  next: "Up next",
+};
+
+const statusTone: Record<Status, string> = {
+  done: "bg-accent-primary-soft text-accent-primary",
+  building: "border border-glass-border bg-glass text-brand-200",
+  next: "border border-glass-border text-brand-400",
+};
+
+const iconTone: Record<Status, string> = {
+  done: "border-accent-primary/30 bg-accent-primary-soft text-accent-primary",
+  building: "border-glass-border bg-glass text-brand-200",
+  next: "border-glass-border bg-glass text-brand-400",
+};
+
+/** Signed-in area while the real board is being built: shows where the product is. */
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect("/login");
@@ -50,14 +100,45 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Hi {firstName}, you&apos;re in.
-        </h1>
-        <p className="mt-4 max-w-md text-lg leading-8 text-brand-300">
-          Your board is next. GitHub sync lands in the next slice, and your
-          activity shows up here the moment it does.
-        </p>
+      <main className="flex flex-1 flex-col items-center px-6 py-16 sm:py-24">
+        <div className="flex w-full max-w-xl flex-col items-center text-center">
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            Hi {firstName}, you&apos;re in.
+          </h1>
+          <p className="mt-4 max-w-md text-lg leading-8 text-brand-300">
+            Your commits are already counting. The board is next.
+          </p>
+        </div>
+
+        <ol className="mt-12 w-full max-w-xl rounded-card border border-glass-border bg-glass p-6 backdrop-blur-xl sm:p-8">
+          {steps.map((step, index) => (
+            <li key={step.title} className="flex gap-5">
+              <div aria-hidden className="flex flex-col items-center">
+                <span
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${iconTone[step.status]}`}
+                >
+                  {step.icon}
+                </span>
+                {index < steps.length - 1 && (
+                  <span className="my-2 w-px flex-1 bg-glass-border" />
+                )}
+              </div>
+              <div className={index < steps.length - 1 ? "pb-8" : ""}>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-2.5">
+                  <h2 className="text-lg font-semibold text-brand-50">
+                    {step.title}
+                  </h2>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusTone[step.status]}`}
+                  >
+                    {statusLabel[step.status]}
+                  </span>
+                </div>
+                <p className="mt-1.5 leading-7 text-brand-300">{step.body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
       </main>
     </>
   );
