@@ -1,12 +1,19 @@
+import type { Metadata } from "next";
+
 import { ContributionGraph } from "@/components/contribution-graph";
 import { FaqSection, faqs } from "@/components/faq-section";
-import { FeaturesSection } from "@/components/features-section";
 import { ActivityPillRow, FloatingIcons } from "@/components/floating-icons";
 import { HowItWorks } from "@/components/how-it-works";
+import { PreviewSection } from "@/components/preview/preview-section";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { SplashScreen } from "@/components/splash-screen";
 import { site } from "@/lib/site";
+
+/** Canonical lives here, not in the root layout, so noindex pages (login, dashboard) don't inherit it. */
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -49,21 +56,21 @@ export default function Home() {
         {/* Header is mt-6 + h-16 = 5.5rem; the hero fills the rest of the first viewport. */}
         <div className="relative flex min-h-[calc(100svh-5.5rem)] flex-col items-center justify-center px-6">
           <FloatingIcons variant={2} />
-          <div className="flex w-full max-w-2xl flex-col items-center gap-8 text-center">
+          <div className="flex w-full max-w-3xl flex-col items-center gap-8 text-center">
             <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
               Your GitHub,
               <br />
               but make it iconic.
             </h1>
             <p className="max-w-lg text-lg leading-8 text-brand-300">
-              Connect your GitHub and watch your activity light up the board.
-              Commits, PRs, issues, and reviews, all in one place.
+              Start larping as the main character. Your commits, PRs, issues,
+              and reviews, all glowing on one board.
             </p>
             <ContributionGraph />
             <ActivityPillRow className="md:hidden" />
           </div>
         </div>
-        <FeaturesSection />
+        <PreviewSection />
         <HowItWorks />
         <FaqSection />
       </main>

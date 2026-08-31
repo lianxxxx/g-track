@@ -7,7 +7,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const navLinks = [
-  { label: "Features", href: "#features" },
+  { label: "Explore", href: "#features" },
   { label: "How it works", href: "#how-it-works" },
   { label: "FAQ", href: "#faq" },
 ];
@@ -51,18 +51,18 @@ export function SiteHeader() {
 
         <div className="col-start-3 flex items-center justify-end gap-3">
           <ThemeToggle />
-          <a
-            href="#"
+          <Link
+            href="/login"
             className="hidden h-10 items-center rounded-full border border-glass-border px-5 text-sm font-medium text-brand-100 transition-colors hover:border-brand-600 hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary md:flex"
           >
             Log in
-          </a>
-          <a
-            href="#"
+          </Link>
+          <Link
+            href="/login"
             className="hidden h-10 items-center rounded-full bg-accent-primary px-5 text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary md:flex"
           >
             Sign up
-          </a>
+          </Link>
           <button
             type="button"
             aria-expanded={menuOpen}
@@ -85,7 +85,7 @@ export function SiteHeader() {
         {menuOpen && (
           <div
             id="mobile-menu"
-            className="absolute inset-x-4 top-[4.25rem] rounded-card border border-glass-border bg-brand-900/95 p-3 backdrop-blur-xl light:bg-brand-950/95 md:hidden"
+            className="absolute inset-x-4 top-[4.25rem] rounded-card border border-glass-border bg-brand-900/95 p-3 backdrop-blur-xl light:bg-brand-950 md:hidden"
           >
             <nav aria-label="Main" className="flex flex-col">
               {navLinks.map((link) => (
@@ -99,19 +99,19 @@ export function SiteHeader() {
                 </a>
               ))}
             </nav>
-            <div className="mt-3 flex flex-col gap-2 border-t border-glass-border pt-3">
-              <a
-                href="#"
+            <div className="mt-3 flex flex-col gap-2">
+              <Link
+                href="/login"
                 className="flex h-11 items-center justify-center rounded-full border border-glass-border text-sm font-medium text-brand-100 transition-colors hover:border-brand-600 hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary"
               >
                 Log in
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/login"
                 className="flex h-11 items-center justify-center rounded-full bg-accent-primary text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
               >
                 Sign up
-              </a>
+              </Link>
             </div>
           </div>
         )}

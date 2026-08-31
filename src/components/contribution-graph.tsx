@@ -8,7 +8,7 @@ const WINDOW_END = Date.UTC(2026, 7, 29);
 const WINDOW_START = WINDOW_END - (WEEKS * DAYS - 1) * 86_400_000;
 
 /** Deterministic PRNG so the server and client render identical cells. */
-function mulberry32(seed: number) {
+export function mulberry32(seed: number) {
   let t = seed;
   return () => {
     t += 0x6d2b79f5;
