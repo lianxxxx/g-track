@@ -13,7 +13,7 @@ g-track is mostly an authenticated dashboard. The SEO surface is the **public ma
 | Site identity (name, description, URL) | `src/lib/site.ts` | Single source of truth. Everything below imports from it, never hardcode the site name/URL elsewhere. |
 | Base URL | `NEXT_PUBLIC_SITE_URL` env var | Set to the production URL when deployed (no trailing slash). Falls back to `http://localhost:3000`. |
 | Page metadata, canonical, OG/Twitter | `src/app/layout.tsx` | `metadataBase` + title template. Public pages set their own `title`/`description`; the template appends `· g-track`. |
-| robots.txt | `src/app/robots.ts` | Allows `/`, disallows `/api/` and `/dashboard/`. |
+| robots.txt | `src/app/robots.ts` | Allows `/`, disallows `/api/` and `/dashboard`. |
 | sitemap.xml | `src/app/sitemap.ts` | Public routes only. |
 | Web app manifest | `src/app/manifest.ts` | |
 | Social preview image | `src/app/opengraph-image.tsx` | Generated with `next/og`. |

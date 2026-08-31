@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
       // Authenticated app and API surface: never useful in a search index.
-      disallow: ["/api/", "/dashboard/"],
+      disallow: ["/api/", "/dashboard"],
     },
     sitemap: `${site.url}/sitemap.xml`,
   };

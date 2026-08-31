@@ -1,8 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  images: {
+    // GitHub profile pictures shown on the dashboard.
+    remotePatterns: [
+      { protocol: "https", hostname: "avatars.githubusercontent.com", pathname: "/u/**" },
+    ],
+  },
 };
 
 export default nextConfig;
