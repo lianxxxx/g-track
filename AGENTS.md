@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Developer activity tracking app. Pulls a developer's activity (starting with GitHub) and visualizes it.
 
-Deeper context: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (system design, data model) and [docs/WORKFLOW.md](docs/WORKFLOW.md) (how we plan, build, and review). Read them before non-trivial changes. SEO conventions live in [docs/SEO.md](docs/SEO.md).
+Deeper context: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (system design, data model) and [docs/WORKFLOW.md](docs/WORKFLOW.md) (how we plan, build, and review). Read them before non-trivial changes. SEO conventions live in [docs/SEO.md](docs/SEO.md). Deployment (Vercel + Neon, env vars, migrations) lives in [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Stack
 

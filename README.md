@@ -47,11 +47,12 @@ npm run lint     # run ESLint
 npm run build    # production build
 ```
 
-Environment variables go in `.env.local` (gitignored). `NEXT_PUBLIC_SITE_URL` should be set to the production URL when deployed; it falls back to `http://localhost:3000` locally.
+Environment variables go in `.env` (gitignored), template in `.env.example`. Production values are set in Vercel, see [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ## Documentation
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): system design, layers, and data model
 - [docs/WORKFLOW.md](docs/WORKFLOW.md): how changes are planned, built, and reviewed
+- [docs/DEPLOY.md](docs/DEPLOY.md): Vercel + Neon environments, env vars, deploy and migration flow
 - [docs/SEO.md](docs/SEO.md): SEO conventions and checklists
 - [AGENTS.md](AGENTS.md): project rules for AI coding agents
