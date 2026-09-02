@@ -24,7 +24,7 @@ Next.js (App Router) · TypeScript · Tailwind CSS · Neon PostgreSQL · Drizzle
 | Components | `src/components/` | Presentational UI and Recharts charts (heatmap, activity charts). No data access. |
 | Auth | `src/lib/auth*` | Better Auth config, GitHub OAuth provider, session helpers, access to the stored GitHub token. |
 | GitHub integration | `src/lib/github*` | Octokit client, fetching activity, mapping GitHub payloads → `activity_events`. The only place that knows GitHub API shapes. |
-| Sync | server-side (route handler / server action) | Orchestrates fetch → normalize → store, updates sync state, recomputes `daily_stats`. |
+| Sync | `src/app/api/sync` | Orchestrates fetch → normalize → store, updates sync state, recomputes `daily_stats`. |
 | Database | `src/db/` | Drizzle schema, migrations, query functions. The only layer that touches the database. |
 | Validation | Zod at boundaries | Route bodies, env vars, any untrusted input. GitHub responses use Octokit's types, not re-validation. |
 | Types | `src/types/` | Shared TypeScript types not derived from schema. |
@@ -53,7 +53,7 @@ Dashboard (src/app + src/components, Recharts)
         heatmap · activity charts
 ```
 
-## Data model (planned)
+## Data model
 
 - **users / auth tables**: owned by Better Auth (user, session, account incl. GitHub token, verification).
 - **projects**: the unit activity is attributed to (a GitHub repository for now), linked to a user.
@@ -63,7 +63,7 @@ Dashboard (src/app + src/components, Recharts)
 
 ## Sources
 
-- **Current:** GitHub only.
+- **Current:** GitHub only, through the Events API. It reaches back about 90 days and 300 events, so a sync is a rolling window rather than a full history. Event payloads no longer carry a push's commit list, so each push is expanded through the compare API (`before...head`) to get the individual commits.
 - **Future (planned, not built):** local Git, Claude Code, Codex. They will eventually write to `activity_events` too, that is why the event model is normalized. Do **not** implement or abstract for them now: no provider interfaces, no source registries, no placeholder modules. The `source` column is the only concession.
 - **Local CLI:** a Node.js TypeScript CLI will be introduced only when local activity tracking is actually built. Nothing for it exists before then.
 
