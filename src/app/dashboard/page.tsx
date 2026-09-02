@@ -3,11 +3,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { FiBarChart2, FiCheck, FiRefreshCw } from "react-icons/fi";
+import {
+  FiAlertCircle,
+  FiCheckCircle,
+  FiEye,
+  FiGitCommit,
+  FiGithub,
+  FiGitMerge,
+  FiGitPullRequest,
+} from "react-icons/fi";
 
+import { ActivityHeatmap } from "@/components/activity-heatmap";
 import { BrandLogo } from "@/components/brand-logo";
 import { SignOutButton } from "@/components/sign-out-button";
+import { SyncButton } from "@/components/sync-button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { getActivityOverview } from "@/db/queries/activity";
+import type { ActivityType } from "@/db/schema/app";
 import { getSession } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -15,61 +27,87 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Status = "done" | "building" | "next";
-
-type Step = {
-  title: string;
-  body: string;
-  status: Status;
-  icon: ReactNode;
+const eventStyles: Record<ActivityType, { tone: string; icon: ReactNode }> = {
+  commit: {
+    tone: "border-event-commit/30 bg-event-commit/12 text-event-commit",
+    icon: <FiGitCommit className="h-4 w-4" strokeWidth={1.75} aria-hidden />,
+  },
+  pr_opened: {
+    tone: "border-event-pr/30 bg-event-pr/12 text-event-pr",
+    icon: (
+      <FiGitPullRequest className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+    ),
+  },
+  pr_merged: {
+    tone: "border-event-pr/30 bg-event-pr/12 text-event-pr",
+    icon: <FiGitMerge className="h-4 w-4" strokeWidth={1.75} aria-hidden />,
+  },
+  issue_opened: {
+    tone: "border-event-star/30 bg-event-star/12 text-event-star",
+    icon: <FiAlertCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden />,
+  },
+  issue_closed: {
+    tone: "border-event-branch/30 bg-event-branch/12 text-event-branch",
+    icon: <FiCheckCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden />,
+  },
+  review: {
+    tone: "border-event-review/30 bg-event-review/12 text-event-review",
+    icon: <FiEye className="h-4 w-4" strokeWidth={1.75} aria-hidden />,
+  },
 };
 
-const steps: Step[] = [
-  {
-    title: "Sign in",
-    body: "Done. Your GitHub account is linked.",
-    status: "done",
-    icon: <FiCheck className="h-5 w-5" strokeWidth={2} aria-hidden />,
-  },
-  {
-    title: "Sync",
-    body: "Being built. Commits, PRs, issues, and reviews will land here.",
-    status: "building",
-    icon: <FiRefreshCw className="h-5 w-5" strokeWidth={1.75} aria-hidden />,
-  },
-  {
-    title: "Slay",
-    body: "Up next. Your board: heatmap, feed, and insights from real activity.",
-    status: "next",
-    icon: <FiBarChart2 className="h-5 w-5" strokeWidth={1.75} aria-hidden />,
-  },
+const eventLabel: Record<ActivityType, string> = {
+  commit: "Commit",
+  pr_opened: "Opened",
+  pr_merged: "Merged",
+  issue_opened: "Issue",
+  issue_closed: "Closed",
+  review: "Reviewed",
+};
+
+const relative = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+const units: [Intl.RelativeTimeFormatUnit, number][] = [
+  ["year", 31_536_000],
+  ["month", 2_592_000],
+  ["day", 86_400],
+  ["hour", 3_600],
+  ["minute", 60],
 ];
 
-const statusLabel: Record<Status, string> = {
-  done: "Done",
-  building: "In progress",
-  next: "Up next",
-};
+/** "3 hours ago". Server-rendered, so there is no client clock to disagree with. */
+function timeAgo(date: Date) {
+  const seconds = Math.round((date.getTime() - Date.now()) / 1000);
 
-const statusTone: Record<Status, string> = {
-  done: "bg-accent-primary-soft text-accent-primary",
-  building: "border border-glass-border bg-glass text-brand-200",
-  next: "border border-glass-border text-brand-400",
-};
+  for (const [unit, size] of units) {
+    if (Math.abs(seconds) >= size) {
+      return relative.format(Math.round(seconds / size), unit);
+    }
+  }
 
-const iconTone: Record<Status, string> = {
-  done: "border-accent-primary/30 bg-accent-primary-soft text-accent-primary",
-  building: "border-glass-border bg-glass text-brand-200",
-  next: "border-glass-border bg-glass text-brand-400",
-};
+  return relative.format(Math.round(seconds), "second");
+}
 
-/** Signed-in area while the real board is being built: shows where the product is. */
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
   const { user } = session;
-  const firstName = user.name.split(" ")[0] || user.name;
+  // GitHub display names can arrive padded (" Leyanne ").
+  const name = user.name.trim();
+  const firstName = name.split(/\s+/)[0] || name;
+  const { integration, total, byType, recent, daily } = await getActivityOverview(
+    user.id,
+  );
+
+  const stats = [
+    { label: "Events", value: total },
+    { label: "Commits", value: byType.get("commit") ?? 0 },
+    {
+      label: "Pull requests",
+      value: (byType.get("pr_opened") ?? 0) + (byType.get("pr_merged") ?? 0),
+    },
+    { label: "Reviews", value: byType.get("review") ?? 0 },
+  ];
 
   return (
     <>
@@ -93,52 +131,122 @@ export default async function DashboardPage() {
               />
             )}
             <span className="hidden text-sm text-brand-200 sm:inline">
-              {user.name}
+              {name}
             </span>
             <SignOutButton />
           </div>
         </div>
       </header>
 
-      <main className="flex flex-1 flex-col items-center px-6 py-16 sm:py-24">
-        <div className="flex w-full max-w-xl flex-col items-center text-center">
+      <main className="flex flex-1 flex-col px-6 py-12 sm:py-16">
+        <div className="mx-auto w-full max-w-3xl">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             Hi {firstName}, you&apos;re in.
           </h1>
-          <p className="mt-4 max-w-md text-lg leading-8 text-brand-300">
-            Your commits are already counting. The board is next.
+          <p className="mt-3 text-lg leading-8 text-brand-300">
+            {integration?.lastSyncedAt
+              ? `Last synced ${timeAgo(integration.lastSyncedAt)}.`
+              : "Pull your GitHub activity and the board fills up."}
           </p>
-        </div>
 
-        <ol className="mt-12 w-full max-w-xl rounded-card border border-glass-border bg-glass p-6 backdrop-blur-xl sm:p-8">
-          {steps.map((step, index) => (
-            <li key={step.title} className="flex gap-5">
-              <div aria-hidden className="flex flex-col items-center">
-                <span
-                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${iconTone[step.status]}`}
-                >
-                  {step.icon}
-                </span>
-                {index < steps.length - 1 && (
-                  <span className="my-2 w-px flex-1 bg-glass-border" />
-                )}
+          {integration?.status === "error" && (
+            <p
+              role="alert"
+              className="mt-6 rounded-xl border border-state-error/30 bg-state-error/10 px-4 py-3 text-sm text-state-error"
+            >
+              The last sync didn&apos;t finish. Try again in a moment.
+            </p>
+          )}
+
+          {total === 0 ? (
+            <div className="mt-10 flex flex-col items-center rounded-card border border-glass-border bg-glass p-8 text-center backdrop-blur-xl sm:p-12">
+              <span
+                aria-hidden
+                className="flex h-12 w-12 items-center justify-center rounded-xl border border-glass-border bg-glass text-brand-200"
+              >
+                <FiGithub className="h-6 w-6" strokeWidth={1.75} />
+              </span>
+              <h2 className="mt-5 text-lg font-semibold text-brand-50">
+                Nothing synced yet
+              </h2>
+              <p className="mt-2 max-w-sm leading-7 text-brand-300">
+                Your commits, pull requests, issues, and reviews land here.
+                GitHub keeps about 90 days of activity, so the first sync covers
+                roughly the last three months.
+              </p>
+              <div className="mt-7">
+                <SyncButton label="Sync my activity" />
               </div>
-              <div className={index < steps.length - 1 ? "pb-8" : ""}>
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-2.5">
-                  <h2 className="text-lg font-semibold text-brand-50">
-                    {step.title}
-                  </h2>
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusTone[step.status]}`}
+            </div>
+          ) : (
+            <>
+              <dl className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {stats.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="rounded-xl border border-glass-border bg-glass px-4 py-4 backdrop-blur-xl"
                   >
-                    {statusLabel[step.status]}
-                  </span>
-                </div>
-                <p className="mt-1.5 leading-7 text-brand-300">{step.body}</p>
+                    <dt className="text-xs font-medium text-brand-400">
+                      {stat.label}
+                    </dt>
+                    <dd className="mt-1 text-2xl font-semibold tabular-nums text-brand-50">
+                      {stat.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
+              <div className="mt-6">
+                <ActivityHeatmap days={daily} />
               </div>
-            </li>
-          ))}
-        </ol>
+
+              <section className="mt-6 rounded-card border border-glass-border bg-glass p-6 backdrop-blur-xl sm:p-8">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <h2 className="text-lg font-semibold text-brand-50">
+                    Recent activity
+                  </h2>
+                  <SyncButton variant="secondary" />
+                </div>
+
+                <ul className="mt-5 flex flex-col gap-1.5">
+                  {recent.map((event) => {
+                    const style = eventStyles[event.type];
+
+                    return (
+                      <li key={event.id}>
+                        <a
+                          href={event.url ?? "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-3 rounded-xl border border-glass-border bg-glass px-3 py-2 transition-colors hover:border-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+                        >
+                          <span
+                            aria-hidden
+                            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border ${style.tone}`}
+                          >
+                            {style.icon}
+                          </span>
+                          <span className="truncate text-sm text-brand-200">
+                            <span className="sr-only">
+                              {eventLabel[event.type]}:{" "}
+                            </span>
+                            {event.title ?? eventLabel[event.type]}
+                          </span>
+                          <span className="ml-auto hidden shrink-0 font-mono text-xs text-brand-400 sm:inline">
+                            {event.project}
+                          </span>
+                          <span className="shrink-0 text-xs text-brand-400 tabular-nums">
+                            {timeAgo(event.occurredAt)}
+                          </span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            </>
+          )}
+        </div>
       </main>
     </>
   );
