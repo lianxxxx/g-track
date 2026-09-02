@@ -24,6 +24,9 @@ export const activityType = pgEnum("activity_type", [
   "review",
 ]);
 
+/** The activity types the app tracks, derived from the enum above. */
+export type ActivityType = (typeof activityType.enumValues)[number];
+
 export const integrationStatus = pgEnum("integration_status", [
   "idle",
   "syncing",
