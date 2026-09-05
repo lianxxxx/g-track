@@ -29,7 +29,10 @@ const tabs = [
 ];
 
 export function PreviewSection() {
-  const [active, setActive] = useState(0);
+  /* Feed is the default: the hero already shows a contribution graph. */
+  const [active, setActive] = useState(
+    tabs.findIndex((tab) => tab.id === "feed"),
+  );
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const focusTab = (index: number) => {
@@ -94,7 +97,7 @@ export function PreviewSection() {
               onClick={() => setActive(index)}
               className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary sm:px-4 ${
                 active === index
-                  ? "bg-accent-primary font-medium text-brand-950"
+                  ? "bg-accent-primary-soft font-medium text-accent-primary"
                   : "text-brand-300 hover:bg-glass hover:text-brand-50"
               }`}
             >

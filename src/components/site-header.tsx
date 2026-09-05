@@ -14,6 +14,8 @@ const navLinks = [
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  /* Which section the reader is currently in, or null while the hero fills the screen. */
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -23,6 +25,31 @@ export function SiteHeader() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [menuOpen]);
+
+  // Scrollspy: a section counts as current while it crosses the band sitting
+  // 25%-40% down the viewport, so the highlight changes at a natural reading point.
+  useEffect(() => {
+    const sections = navLinks
+      .map((link) => document.getElementById(link.href.slice(1)))
+      .filter((section): section is HTMLElement => section !== null);
+    if (sections.length === 0) return;
+
+    const visible = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target.id);
+          else visible.delete(entry.target.id);
+        }
+        const current = navLinks.find((link) => visible.has(link.href.slice(1)));
+        setActiveId(current ? current.href.slice(1) : null);
+      },
+      { rootMargin: "-25% 0px -60% 0px" },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 mt-6 bg-brand-950/70 backdrop-blur-xl">
@@ -38,15 +65,23 @@ export function SiteHeader() {
           aria-label="Main"
           className="col-start-2 hidden items-center gap-1 rounded-full border border-glass-border bg-glass p-1.5 backdrop-blur-xl md:flex"
         >
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="rounded-full px-4 py-1.5 text-sm text-brand-300 transition-colors hover:bg-glass hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = activeId === link.href.slice(1);
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                aria-current={isActive ? "location" : undefined}
+                className={`rounded-full px-4 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
+                  isActive
+                    ? "bg-accent-primary-soft font-medium text-accent-primary"
+                    : "text-brand-300 hover:bg-glass hover:text-brand-50"
+                }`}
+              >
+                {link.label}
+              </a>
+            );
+          })}
         </nav>
 
         <div className="col-start-3 flex items-center justify-end gap-3">
@@ -85,19 +120,27 @@ export function SiteHeader() {
         {menuOpen && (
           <div
             id="mobile-menu"
-            className="absolute inset-x-4 top-[4.25rem] rounded-card border border-glass-border bg-brand-900/95 p-3 backdrop-blur-xl light:bg-brand-950 md:hidden"
+            className="absolute inset-x-4 top-[4.25rem] rounded-card border border-glass-border bg-brand-900 p-3 light:bg-brand-950 md:hidden"
           >
             <nav aria-label="Main" className="flex flex-col">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-xl px-4 py-3 text-base text-brand-200 transition-colors hover:bg-glass hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = activeId === link.href.slice(1);
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    aria-current={isActive ? "location" : undefined}
+                    className={`rounded-xl px-4 py-3 text-base transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
+                      isActive
+                        ? "bg-accent-primary-soft font-medium text-accent-primary"
+                        : "text-brand-200 hover:bg-glass hover:text-brand-50"
+                    }`}
+                  >
+                    {link.label}
+                  </a>
+                );
+              })}
             </nav>
             <div className="mt-3 flex flex-col gap-2">
               <Link

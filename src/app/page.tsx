@@ -54,15 +54,15 @@ export default function Home() {
       />
       <main className="flex-1">
         {/* Header is mt-6 + h-16 = 5.5rem; the hero fills the rest of the first viewport. */}
-        <div className="relative flex min-h-[calc(100svh-5.5rem)] flex-col items-center justify-center px-6">
+        <div className="relative flex min-h-[calc(100svh-5.5rem)] flex-col items-center justify-center px-6 py-12 sm:py-16">
           <FloatingIcons variant={2} />
           <div className="flex w-full max-w-3xl flex-col items-center gap-8 text-center">
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-              Your GitHub,
-              <br />
+            <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+              Your GitHub,{" "}
+              <br className="hidden sm:inline" />
               but make it iconic.
             </h1>
-            <p className="max-w-lg text-lg leading-8 text-brand-300">
+            <p className="max-w-lg text-pretty text-lg leading-8 text-brand-300">
               Start larping as the main character. Your commits, PRs, issues,
               and reviews, all glowing on one board.
             </p>

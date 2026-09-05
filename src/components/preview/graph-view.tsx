@@ -42,11 +42,11 @@ export function GraphView() {
           {graphStats.map((stat) => (
             <div
               key={stat.label}
-              className="px-3 first:pl-0 last:pr-0 sm:px-6"
+              className="px-2.5 first:pl-0 last:pr-0 sm:px-6"
             >
-              <dt className="text-xs text-brand-400">{stat.label}</dt>
-              <dd className="mt-1 flex items-baseline gap-1.5">
-                <span className="font-heading text-2xl font-semibold tracking-tight text-brand-50 tabular-nums">
+              <dt className="min-h-8 text-xs leading-tight text-brand-400 sm:min-h-0">{stat.label}</dt>
+              <dd className="mt-1 flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
+                <span className="font-heading text-xl font-semibold tracking-tight text-brand-50 tabular-nums sm:text-2xl">
                   {stat.value}
                 </span>
                 {stat.unit && (
