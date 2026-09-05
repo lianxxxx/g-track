@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
@@ -15,9 +14,9 @@ import {
 
 import { ActivityHeatmap } from "@/components/activity-heatmap";
 import { BrandLogo } from "@/components/brand-logo";
-import { SignOutButton } from "@/components/sign-out-button";
 import { SyncButton } from "@/components/sync-button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserMenu } from "@/components/user-menu";
 import { getActivityOverview } from "@/db/queries/activity";
 import type { ActivityType } from "@/db/schema/app";
 import { getSession } from "@/lib/auth";
@@ -121,19 +120,7 @@ export default async function DashboardPage() {
           </Link>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            {user.image && (
-              <Image
-                src={user.image}
-                alt=""
-                width={36}
-                height={36}
-                className="h-9 w-9 rounded-full border border-glass-border"
-              />
-            )}
-            <span className="hidden text-sm text-brand-200 sm:inline">
-              {name}
-            </span>
-            <SignOutButton />
+            <UserMenu name={name} email={user.email} image={user.image ?? null} />
           </div>
         </div>
       </header>
@@ -141,7 +128,26 @@ export default async function DashboardPage() {
       <main className="flex flex-1 flex-col px-6 py-12 sm:py-16">
         <div className="mx-auto w-full max-w-3xl">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Hi {firstName}, you&apos;re in.
+            Hi {firstName},{" "}
+            <span className="relative inline-block whitespace-nowrap">
+              you&apos;re in.
+              {/* Hand-drawn swoosh: asymmetric on purpose so it doesn't read as a border. */}
+              <svg
+                aria-hidden
+                viewBox="0 0 200 12"
+                preserveAspectRatio="none"
+                className="absolute inset-x-0 -bottom-1 h-[0.32em] w-full text-accent-primary"
+              >
+                <path
+                  d="M3 9 Q 100 0 197 7"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            </span>
           </h1>
           <p className="mt-3 text-lg leading-8 text-brand-300">
             {integration?.lastSyncedAt

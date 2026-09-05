@@ -179,4 +179,11 @@
   h6 {
     font-family: var(--font-heading);
   }
+
+  /* Tailwind v4 Preflight gives buttons cursor: default; anything clickable should say so.
+     Disabled controls keep whatever cursor their utility sets (e.g. disabled:cursor-wait). */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
 }
