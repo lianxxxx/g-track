@@ -4,32 +4,14 @@ import { FiArrowLeft } from "react-icons/fi";
 import { BrandMark } from "@/components/brand-logo";
 import { GitHubSignInButton } from "@/components/github-sign-in-button";
 
-const copy = {
-  login: {
-    heading: "g-track",
-    body: "Sign in or create your account with GitHub.",
-    button: "Continue with GitHub",
-    errorPath: "/login",
-  },
-  signup: {
-    heading: "g-track",
-    body: "One GitHub login and you're in.",
-    button: "Sign up with GitHub",
-    errorPath: "/signup",
-  },
-} as const;
-
 type Props = {
-  mode: keyof typeof copy;
   /** Present when GitHub bounced back with ?error=... */
   githubFailed: boolean;
 };
 
-/** Shared login / sign-up card. Both modes run the same GitHub OAuth flow;
+/** Sign-in card. One GitHub OAuth flow covers both sign in and sign up:
  *  the account is created on first authorization. */
-export function AuthCard({ mode, githubFailed }: Props) {
-  const c = copy[mode];
-
+export function AuthCard({ githubFailed }: Props) {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-16">
       <div className="flex w-full max-w-sm flex-col items-center rounded-card border border-glass-border bg-glass p-8 text-center backdrop-blur-xl">
@@ -39,8 +21,10 @@ export function AuthCard({ mode, githubFailed }: Props) {
         >
           <BrandMark size={48} />
         </Link>
-        <h1 className="mt-6 text-2xl font-semibold tracking-tight">{c.heading}</h1>
-        <p className="mt-2 leading-7 text-brand-300">{c.body}</p>
+        <h1 className="mt-6 text-2xl font-semibold tracking-tight">g-track</h1>
+        <p className="mt-2 leading-7 text-brand-300">
+          Sign in or create your account with GitHub.
+        </p>
 
         {githubFailed && (
           <p
@@ -52,39 +36,25 @@ export function AuthCard({ mode, githubFailed }: Props) {
         )}
 
         <div className="mt-6 w-full">
-          <GitHubSignInButton label={c.button} errorCallbackURL={c.errorPath} />
+          <GitHubSignInButton label="Continue with GitHub" errorCallbackURL="/login" />
         </div>
 
-        {mode === "signup" ? (
-          <p className="mt-4 text-xs leading-5 text-brand-300">
-            No GitHub account yet?{" "}
-            <a
-              href="https://github.com/signup"
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-sm text-brand-100 underline underline-offset-4 transition-colors hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
-            >
-              Create one on GitHub
-            </a>{" "}
-            first.
-          </p>
-        ) : (
-          <p className="mt-4 text-xs leading-5 text-brand-300">
-            New here?{" "}
-            <Link
-              href="/signup"
-              className="rounded-sm text-brand-100 underline underline-offset-4 transition-colors hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
-            >
-              Sign up
-            </Link>
-          </p>
-        )}
+        <p className="mt-4 text-xs leading-5 text-brand-300">
+          No GitHub account yet?{" "}
+          <a
+            href="https://github.com/signup"
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-sm text-brand-100 underline underline-offset-4 transition-colors hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+          >
+            Create one on GitHub
+          </a>{" "}
+          first.
+        </p>
 
-        {mode === "login" && (
-          <p className="mt-3 text-xs leading-5 text-brand-300">
-            We only read your activity, never your code.
-          </p>
-        )}
+        <p className="mt-3 text-xs leading-5 text-brand-300">
+          We only read your activity, never your code.
+        </p>
       </div>
 
       <Link

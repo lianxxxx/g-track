@@ -15,5 +15,5 @@ export default async function LoginPage(props: PageProps<"/login">) {
   if (session) redirect("/dashboard");
 
   const { error } = await props.searchParams;
-  return <AuthCard mode="login" githubFailed={error !== undefined} />;
+  return <AuthCard githubFailed={error !== undefined} />;
 }

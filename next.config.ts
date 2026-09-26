@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "avatars.githubusercontent.com", pathname: "/u/**" },
     ],
   },
+  async redirects() {
+    return [
+      // Sign up was the same GitHub OAuth flow as /login; keep old links working.
+      { source: "/signup", destination: "/login", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
