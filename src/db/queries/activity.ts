@@ -3,11 +3,13 @@ import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   activityEvents,
+  contributionDays,
   dailyStats,
   integrations,
   projects,
 } from "@/db/schema/app";
 import type { NormalizedEvent } from "@/lib/github/activity";
+import type { ContributionDay } from "@/lib/github/contributions";
 
 /** The UTC calendar day of an event, matching daily_stats.day. */
 const utcDay = sql<string>`(${activityEvents.occurredAt} AT TIME ZONE 'utc')::date`;
@@ -156,6 +158,26 @@ async function recomputeDailyStats(userId: string, days: string[]) {
     });
 }
 
+/**
+ * Upsert a user's contribution calendar. GitHub returns the whole year every
+ * time, so each day's count is overwritten with the latest value. Idempotent,
+ * so a failed sync can simply run again.
+ */
+export async function storeContributionDays(
+  userId: string,
+  days: ContributionDay[],
+) {
+  if (days.length === 0) return;
+
+  await db
+    .insert(contributionDays)
+    .values(days.map((entry) => ({ userId, day: entry.day, count: entry.count })))
+    .onConflictDoUpdate({
+      target: [contributionDays.userId, contributionDays.day],
+      set: { count: sql`excluded.count`, updatedAt: new Date() },
+    });
+}
+
 /** The heatmap window: 52 weeks plus the current partial week. */
 const HEATMAP_DAYS = 371;
 
@@ -173,12 +195,6 @@ export async function getActivityOverview(userId: string) {
     )
     .limit(1);
 
-  const totals = await db
-    .select({ type: activityEvents.type, count: sql<number>`count(*)::int` })
-    .from(activityEvents)
-    .where(eq(activityEvents.userId, userId))
-    .groupBy(activityEvents.type);
-
   const recent = await db
     .select({
       id: activityEvents.id,
@@ -194,27 +210,24 @@ export async function getActivityOverview(userId: string) {
     .orderBy(desc(activityEvents.occurredAt))
     .limit(8);
 
+  // Heatmap and stats come from the contribution calendar: a full year,
+  // private contributions included, matching the user's GitHub profile.
   const daily = await db
-    .select({
-      day: dailyStats.day,
-      count: sql<number>`sum(${dailyStats.count})::int`,
-    })
-    .from(dailyStats)
+    .select({ day: contributionDays.day, count: contributionDays.count })
+    .from(contributionDays)
     .where(
       and(
-        eq(dailyStats.userId, userId),
+        eq(contributionDays.userId, userId),
         gte(
-          dailyStats.day,
+          contributionDays.day,
           toUtcDay(new Date(Date.now() - HEATMAP_DAYS * 86_400_000)),
         ),
       ),
-    )
-    .groupBy(dailyStats.day);
+    );
 
   return {
     integration: integration ?? null,
-    total: totals.reduce((sum, row) => sum + row.count, 0),
-    byType: new Map(totals.map((row) => [row.type, row.count])),
+    total: daily.reduce((sum, row) => sum + row.count, 0),
     recent,
     daily,
   };

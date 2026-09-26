@@ -116,6 +116,30 @@ export const dailyStats = pgTable(
   (t) => [uniqueIndex("daily_stats_user_day_type_idx").on(t.userId, t.day, t.type)],
 );
 
+/**
+ * Per-user daily counts from GitHub's contribution calendar: the numbers behind
+ * the graph on a GitHub profile. Unlike activity_events (a ~90 day rolling
+ * window, public repos only), this covers a full year and includes private
+ * contributions as counts when the user allows it. Powers the heatmap and the
+ * dashboard stats; activity_events still powers the recent activity list.
+ */
+export const contributionDays = pgTable(
+  "contribution_days",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    /** Calendar day as GitHub reports it. */
+    day: date("day").notNull(),
+    count: integer("count").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [uniqueIndex("contribution_days_user_day_idx").on(t.userId, t.day)],
+);
+
 /** Per-user, per-source connection and sync cursor. Makes fetches incremental and failures visible. */
 export const integrations = pgTable(
   "integrations",

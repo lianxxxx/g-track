@@ -2,16 +2,18 @@ import {
   markSyncFailed,
   markSyncStarted,
   storeActivity,
+  storeContributionDays,
 } from "@/db/queries/activity";
 import { getSession } from "@/lib/auth";
 import { fetchRecentActivity } from "@/lib/github/activity";
 import { getGitHubClient } from "@/lib/github/client";
+import { fetchContributionCalendar } from "@/lib/github/contributions";
 
 // Each push costs an extra GitHub call to expand its commits, so a first sync
 // over a busy 90 days needs more than the 10s default.
 export const maxDuration = 60;
 
-/** Pull the signed-in user's recent GitHub activity and store it. */
+/** Pull the signed-in user's GitHub contribution calendar and recent activity, and store both. */
 export async function POST() {
   const session = await getSession();
   if (!session) {
@@ -27,9 +29,14 @@ export async function POST() {
   await markSyncStarted(userId);
 
   try {
-    const events = await fetchRecentActivity(octokit);
+    const [calendar, events] = await Promise.all([
+      fetchContributionCalendar(octokit),
+      fetchRecentActivity(octokit),
+    ]);
+    // Calendar first: storeActivity marks the integration synced as its last step.
+    await storeContributionDays(userId, calendar);
     const stored = await storeActivity(userId, events);
-    return Response.json(stored);
+    return Response.json({ ...stored, days: calendar.length });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("GitHub sync failed", error);
