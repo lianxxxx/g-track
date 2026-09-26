@@ -106,7 +106,7 @@ export function UserMenu({ name, email, image }: Props) {
             role="menuitem"
             onClick={signOut}
             disabled={pending}
-            className="mt-2 flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-brand-100 transition-colors hover:bg-glass hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary disabled:cursor-wait disabled:opacity-70"
+            className="mt-2 flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-brand-100 transition-colors hover:bg-brand-800/60 hover:text-brand-50 light:hover:bg-brand-900/60 focus-visible:outline-2 focus-visible:outline-accent-primary disabled:cursor-wait disabled:opacity-70"
           >
             <FiLogOut className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
             {pending ? "Signing out" : "Sign out"}

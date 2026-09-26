@@ -1,5 +1,3 @@
-import { FiChevronDown, FiTrendingUp } from "react-icons/fi";
-
 const WEEKS = 48;
 const DAYS = 7;
 
@@ -19,19 +17,6 @@ export function mulberry32(seed: number) {
   };
 }
 
-const rand = mulberry32(20260825);
-
-const levels: number[] = Array.from({ length: WEEKS * DAYS }, () => {
-  const r = rand();
-  if (r < 0.28) return 0;
-  if (r < 0.55) return 1;
-  if (r < 0.76) return 2;
-  if (r < 0.92) return 3;
-  return 4;
-});
-
-const total = levels.reduce((sum, level) => sum + level, 0) * 2;
-
 const monthFormat = new Intl.DateTimeFormat("en-US", {
   month: "short",
   timeZone: "UTC",
@@ -45,100 +30,79 @@ const monthLabels = Array.from({ length: WEEKS }, (_, week) => {
   .filter((entry, index, all) => index === 0 || entry.month !== all[index - 1].month)
   .filter((entry, index, all) => index > 0 || all[1].week - entry.week >= 3);
 
-const weekdayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
+const DAY_MS = 86_400_000;
 
-/* Sequential green ramp, low -> high (monotonic lightness in both themes). */
-export const cellColor = [
-  "bg-heat-0",
-  "bg-heat-1",
-  "bg-heat-2",
-  "bg-accent-primary",
-  "bg-accent-primary-hover",
-];
+/** Grid index of a UTC date inside the window (column-major: week, then weekday). */
+function dayIndex(year: number, month: number, day: number) {
+  return Math.round((Date.UTC(year, month, day) - WINDOW_START) / DAY_MS);
+}
+
+/* The data tells a story: steady autumn, a dead December, a March crunch, a strong finish. */
+function density(week: number) {
+  if (week < 10) return 0.4;
+  if (week < 18) return 0.3;
+  if (week < 28) return 0.65;
+  if (week < 38) return 0.4;
+  return 0.75;
+}
+
+const breakStart = dayIndex(2025, 11, 8);
+const breakEnd = dayIndex(2026, 0, 3);
+const crunchDay = dayIndex(2026, 2, 14);
+const today = WEEKS * DAYS - 1;
+
+const rand = mulberry32(20260825);
+
+const levels: number[] = Array.from({ length: WEEKS * DAYS }, (_, index) => {
+  const active = rand() < density(Math.floor(index / DAYS));
+  const r = rand();
+  if (index >= breakStart && index <= breakEnd) return 0;
+  if (index === crunchDay || index === today) return 4;
+  if (!active) return 0;
+  if (r < 0.45) return 1;
+  if (r < 0.75) return 2;
+  if (r < 0.93) return 3;
+  return 4;
+});
+
+/* Neutral brand ramp, low -> high. Empty days are outlined, see-through squares.
+   Shared with the dashboard heatmap so both graphs read the same. */
+export const squareColor = ["border border-brand-800", "bg-brand-700", "bg-brand-500", "bg-brand-300", "bg-brand-50"];
 
 const columns = "grid-cols-[repeat(48,minmax(0,1fr))]";
-const cellGap = "gap-[2px] sm:gap-[3px]";
+const cellGap = "gap-[3px] sm:gap-1";
+const weekdayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
 
-/** Decorative dashboard preview: a contribution heatmap fading out at the bottom. */
+/** Decorative hero graph: a year of activity with a shape to it. */
 export function ContributionGraph() {
   return (
-    <div
-      aria-hidden
-      className="w-full [mask-image:linear-gradient(to_bottom,black_55%,transparent_100%)]"
-    >
-      <div className="rounded-card border border-glass-border bg-glass p-5 backdrop-blur-xl sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-          <div className="flex items-center gap-3">
-            <p className="text-left">
-              <span className="font-heading text-xl font-semibold tracking-tight text-brand-50 tabular-nums">
-                {total.toLocaleString("en-US")}
-              </span>{" "}
-              <span className="text-xs text-brand-400">
-                contributions · last year
-              </span>
-            </p>
-            <span className="inline-flex items-center gap-1 rounded-full bg-accent-primary-soft px-2 py-0.5 text-xs font-medium text-accent-primary tabular-nums">
-              <FiTrendingUp className="h-3 w-3" strokeWidth={2} aria-hidden />
-              18%
+    <div aria-hidden className="w-full text-left">
+      <div className="grid grid-cols-[auto_1fr] gap-x-2">
+        <span />
+        <div className={`mb-2 grid ${columns} text-[10px] leading-none text-brand-400 sm:text-xs`}>
+          {monthLabels.map((entry) => (
+            <span
+              key={entry.week}
+              className="whitespace-nowrap"
+              style={{ gridColumn: `${entry.week + 1} / span 3` }}
+            >
+              {entry.label}
             </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="hidden items-center gap-1 sm:flex">
-              <span className="text-[10px] text-brand-500">Less</span>
-              {cellColor.map((color) => (
-                <span
-                  key={color}
-                  className={`h-2 w-2 rounded-[2px] ${color}`}
-                />
-              ))}
-              <span className="text-[10px] text-brand-500">More</span>
-            </div>
-            <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-glass-border bg-glass px-2.5 text-xs text-brand-200">
-              Last 12 months
-              <FiChevronDown
-                className="h-3.5 w-3.5 text-brand-400"
-                strokeWidth={1.75}
-                aria-hidden
-              />
-            </span>
-          </div>
+          ))}
         </div>
 
-        <div className="mt-5 grid grid-cols-[auto_1fr] gap-x-2">
-          <span />
-          <div
-            className={`mb-2 grid ${columns} text-[10px] leading-none text-brand-500`}
-          >
-            {monthLabels.map((entry) => (
-              <span
-                key={entry.week}
-                className="whitespace-nowrap"
-                style={{ gridColumn: `${entry.week + 1} / span 3` }}
-              >
-                {entry.label}
-              </span>
-            ))}
-          </div>
+        <div className={`hidden grid-rows-7 ${cellGap} text-xs leading-none text-brand-400 sm:grid`}>
+          {weekdayLabels.map((label, index) => (
+            <span key={index} className="flex items-center justify-end pr-1">
+              {label}
+            </span>
+          ))}
+        </div>
 
-          <div
-            className={`hidden grid-rows-7 ${cellGap} text-[10px] leading-none text-brand-500 sm:grid`}
-          >
-            {weekdayLabels.map((label, index) => (
-              <span key={index} className="flex items-center justify-end pr-1">
-                {label}
-              </span>
-            ))}
-          </div>
-
-          <div className={`col-start-2 grid grid-flow-col grid-rows-7 ${columns} ${cellGap}`}>
-            {levels.map((level, index) => (
-              <span
-                key={index}
-                className={`aspect-square rounded-[2px] ${cellColor[level]}`}
-              />
-            ))}
-          </div>
+        <div className={`col-start-2 grid grid-flow-col grid-rows-7 ${columns} ${cellGap}`}>
+          {levels.map((level, index) => (
+            <span key={index} className={`aspect-square rounded-[3px] ${squareColor[level]}`} />
+          ))}
         </div>
       </div>
     </div>

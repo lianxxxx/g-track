@@ -16,22 +16,16 @@ export function SiteFooter() {
           <BrandLogo />
         </Link>
 
-        <p className="mt-3 text-sm text-brand-300">Your GitHub, but make it iconic.</p>
+        <p className="mt-3 text-sm text-brand-300">
+          Your GitHub, but make it <span className="italic">iconic.</span>
+        </p>
 
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/signup"
-            className="flex h-11 items-center rounded-full bg-accent-primary px-6 text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
-          >
-            Sign up
-          </Link>
-          <Link
-            href="/login"
-            className="flex h-11 items-center rounded-full border border-glass-border px-6 text-sm font-medium text-brand-100 transition-colors hover:border-brand-600 hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary"
-          >
-            Log in
-          </Link>
-        </div>
+        <Link
+          href="/login"
+          className="mt-5 flex h-11 items-center rounded-full bg-accent-primary px-6 text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+        >
+          Sign in
+        </Link>
 
         <p className="mt-10 text-xs text-brand-300">
           © {new Date().getFullYear()} {site.name}

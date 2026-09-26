@@ -41,7 +41,7 @@ export function FaqSection() {
           id="faq-heading"
           className="text-balance text-center text-3xl font-semibold tracking-tight sm:text-4xl"
         >
-          Things people ask before they commit
+          Things people ask before they <span className="italic">commit</span>
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-pretty text-center text-lg leading-8 text-brand-300">
           No, we don&apos;t read your code. Yes, it&apos;s free to look.

@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { FiCompass, FiHelpCircle, FiLayers } from "react-icons/fi";
 
 import { BrandLogo } from "@/components/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
+/* Icons show in the mobile menu only; the desktop pill nav stays text. */
 const navLinks = [
-  { label: "Explore", href: "#features" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "FAQ", href: "#faq" },
+  { label: "Explore", href: "#features", icon: FiCompass },
+  { label: "How it works", href: "#how-it-works", icon: FiLayers },
+  { label: "FAQ", href: "#faq", icon: FiHelpCircle },
 ];
 
 export function SiteHeader() {
@@ -74,8 +76,8 @@ export function SiteHeader() {
                 aria-current={isActive ? "location" : undefined}
                 className={`rounded-full px-4 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
                   isActive
-                    ? "bg-accent-primary-soft font-medium text-accent-primary"
-                    : "text-brand-300 hover:bg-glass hover:text-brand-50"
+                    ? "bg-brand-800 font-medium text-brand-50 light:bg-brand-900"
+                    : "text-brand-300 hover:bg-brand-800/60 hover:text-brand-50 light:hover:bg-brand-900/60"
                 }`}
               >
                 {link.label}
@@ -86,17 +88,12 @@ export function SiteHeader() {
 
         <div className="col-start-3 flex items-center justify-end gap-3">
           <ThemeToggle />
+          {/* One button: sign in also creates the account on first GitHub authorization. */}
           <Link
             href="/login"
-            className="hidden h-10 items-center rounded-full border border-glass-border px-5 text-sm font-medium text-brand-100 transition-colors hover:border-brand-600 hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary md:flex"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
             className="hidden h-10 items-center rounded-full bg-accent-primary px-5 text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary md:flex"
           >
-            Sign up
+            Sign in
           </Link>
           <button
             type="button"
@@ -131,31 +128,24 @@ export function SiteHeader() {
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
                     aria-current={isActive ? "location" : undefined}
-                    className={`rounded-xl px-4 py-3 text-base transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
+                    className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
                       isActive
-                        ? "bg-accent-primary-soft font-medium text-accent-primary"
-                        : "text-brand-200 hover:bg-glass hover:text-brand-50"
+                        ? "bg-brand-800 font-medium text-brand-50 light:bg-brand-900"
+                        : "text-brand-200 hover:bg-brand-800/60 hover:text-brand-50 light:hover:bg-brand-900/60"
                     }`}
                   >
+                    <link.icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
                     {link.label}
                   </a>
                 );
               })}
             </nav>
-            <div className="mt-3 flex flex-col gap-2">
-              <Link
-                href="/login"
-                className="flex h-11 items-center justify-center rounded-full border border-glass-border text-sm font-medium text-brand-100 transition-colors hover:border-brand-600 hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/signup"
-                className="flex h-11 items-center justify-center rounded-full bg-accent-primary text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
-              >
-                Sign up
-              </Link>
-            </div>
+            <Link
+              href="/login"
+              className="mt-3 flex h-11 items-center justify-center rounded-full bg-accent-primary text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+            >
+              Sign in
+            </Link>
           </div>
         )}
       </div>

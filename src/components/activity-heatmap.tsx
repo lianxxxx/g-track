@@ -1,4 +1,4 @@
-import { cellColor } from "@/components/contribution-graph";
+import { squareColor } from "@/components/contribution-graph";
 
 const WEEKS = 52;
 const DAYS = 7;
@@ -10,7 +10,7 @@ type Props = {
 };
 
 /** Counts to colour steps. Tuned for one developer, not a whole org. */
-function levelOf(count: number) {
+export function levelOf(count: number) {
   if (count === 0) return 0;
   if (count < 3) return 1;
   if (count < 6) return 2;
@@ -55,8 +55,6 @@ export function ActivityHeatmap({ days }: Props) {
     return { date, day, count, future: date > today };
   });
 
-  const total = cells.reduce((sum, cell) => sum + cell.count, 0);
-
   /* One label per month boundary, skipping a first one that would collide. */
   const monthLabels = Array.from({ length: WEEKS }, (_, week) => {
     const date = new Date(start + week * DAYS * DAY_MS);
@@ -68,29 +66,10 @@ export function ActivityHeatmap({ days }: Props) {
     .filter((entry, index, all) => index > 0 || all[1].week - entry.week >= 3);
 
   return (
-    <section className="rounded-card border border-glass-border bg-glass p-6 backdrop-blur-xl sm:p-8">
-      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-        <h2 className="text-lg font-semibold text-brand-50">
-          {total.toLocaleString("en-US")}{" "}
-          <span className="text-sm font-normal text-brand-400">
-            {total === 1 ? "event" : "events"} in the last year
-          </span>
-        </h2>
-
-        <div className="flex items-center gap-1">
-          <span className="text-[10px] text-brand-500">Less</span>
-          {cellColor.map((color) => (
-            <span key={color} className={`h-2 w-2 rounded-[2px] ${color}`} />
-          ))}
-          <span className="text-[10px] text-brand-500">More</span>
-        </div>
-      </div>
-
-      <div className="mt-5 grid grid-cols-[auto_1fr] gap-x-2">
+    <div className="w-full">
+      <div className="grid grid-cols-[auto_1fr] gap-x-2">
         <span />
-        <div
-          className={`mb-2 grid ${columns} text-[10px] leading-none text-brand-500`}
-        >
+        <div className={`mb-2 grid ${columns} text-[10px] leading-none text-brand-400 sm:text-xs`}>
           {monthLabels.map((entry) => (
             <span
               key={entry.week}
@@ -102,9 +81,7 @@ export function ActivityHeatmap({ days }: Props) {
           ))}
         </div>
 
-        <div
-          className={`hidden grid-rows-7 ${cellGap} text-[10px] leading-none text-brand-500 sm:grid`}
-        >
+        <div className={`hidden grid-rows-7 ${cellGap} text-xs leading-none text-brand-400 sm:grid`}>
           {weekdayLabels.map((label, index) => (
             <span key={index} className="flex items-center justify-end pr-1">
               {label}
@@ -112,9 +89,7 @@ export function ActivityHeatmap({ days }: Props) {
           ))}
         </div>
 
-        <div
-          className={`col-start-2 grid grid-flow-col grid-rows-7 ${columns} ${cellGap}`}
-        >
+        <div className={`col-start-2 grid grid-flow-col grid-rows-7 ${columns} ${cellGap}`}>
           {cells.map((cell) => (
             <span
               key={cell.day}
@@ -123,11 +98,19 @@ export function ActivityHeatmap({ days }: Props) {
                   ? undefined
                   : `${cell.count} ${cell.count === 1 ? "event" : "events"} on ${dayFormat.format(cell.date)}`
               }
-              className={`aspect-square rounded-[2px] ${cellColor[levelOf(cell.count)]} ${cell.future ? "opacity-40" : ""}`}
+              className={`aspect-square rounded-[2px] sm:rounded-[3px] ${cell.future ? "" : squareColor[levelOf(cell.count)]}`}
             />
           ))}
         </div>
       </div>
-    </section>
+
+      <div className="mt-4 hidden items-center justify-end gap-1.5 sm:flex">
+        <span className="mr-1 text-xs text-brand-400">Less</span>
+        {squareColor.map((color) => (
+          <span key={color} className={`h-2.5 w-2.5 rounded-[3px] ${color}`} />
+        ))}
+        <span className="ml-1 text-xs text-brand-400">More</span>
+      </div>
+    </div>
   );
 }

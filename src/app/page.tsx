@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { ContributionGraph } from "@/components/contribution-graph";
 import { FaqSection, faqs } from "@/components/faq-section";
-import { ActivityPillRow, FloatingIcons } from "@/components/floating-icons";
 import { HowItWorks } from "@/components/how-it-works";
 import { PreviewSection } from "@/components/preview/preview-section";
 import { SiteFooter } from "@/components/site-footer";
@@ -53,21 +53,28 @@ export default function Home() {
         }}
       />
       <main className="flex-1">
-        {/* Header is mt-6 + h-16 = 5.5rem; the hero fills the rest of the first viewport. */}
-        <div className="relative flex min-h-[calc(100svh-5.5rem)] flex-col items-center justify-center px-6 py-12 sm:py-16">
-          <FloatingIcons variant={2} />
-          <div className="flex w-full max-w-3xl flex-col items-center gap-8 text-center">
-            <h1 className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
-              Your GitHub,{" "}
-              <br className="hidden sm:inline" />
-              but make it iconic.
+        <div className="px-6 pb-12 pt-14 sm:pt-20">
+          <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center text-center">
+            <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-brand-50 sm:text-5xl lg:whitespace-nowrap">
+              Your GitHub, but make it{" "}
+              <span className="italic">iconic.</span>
             </h1>
-            <p className="max-w-lg text-pretty text-lg leading-8 text-brand-300">
+
+            <p className="mt-6 max-w-md text-pretty text-base leading-7 text-brand-300 sm:text-lg sm:leading-8">
               Start larping as the main character. Your commits, PRs, issues,
               and reviews, all glowing on one board.
             </p>
-            <ContributionGraph />
-            <ActivityPillRow className="md:hidden" />
+
+            <Link
+              href="/login"
+              className="mt-9 flex h-12 items-center rounded-full bg-accent-primary px-7 text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
+            >
+              Start tracking
+            </Link>
+
+            <div className="mt-16 w-full sm:mt-20">
+              <ContributionGraph />
+            </div>
           </div>
         </div>
         <PreviewSection />
