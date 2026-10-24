@@ -1,7 +1,6 @@
 "use client";
 
 import type { MouseEvent } from "react";
-import { FiMoon, FiSun } from "react-icons/fi";
 
 /* Must match the key read by the theme init script in src/app/layout.tsx. */
 const THEME_STORAGE_KEY = "g-track-theme";
@@ -65,16 +64,71 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand-100 transition-colors hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary"
     >
-      <FiSun
+      {/* Hand-built like the moon: the Feather sun, its disc hatched on the lower half. */}
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.75}
+        strokeLinecap="round"
+        strokeLinejoin="round"
         className={`${ICON_CLASS} light:-rotate-90 light:scale-0 light:opacity-0`}
-        strokeWidth={1.75}
         aria-hidden
-      />
-      <FiMoon
+      >
+        <defs>
+          <pattern
+            id="sun-hatch"
+            width={3}
+            height={3}
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(45)"
+          >
+            <line x1={0} y1={0} x2={0} y2={3} strokeWidth={1} />
+          </pattern>
+          <clipPath id="sun-half">
+            <rect x={0} y={12} width={24} height={12} />
+          </clipPath>
+        </defs>
+        <circle cx={12} cy={12} r={5} fill="url(#sun-hatch)" stroke="none" clipPath="url(#sun-half)" />
+        <circle cx={12} cy={12} r={5} />
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+      </svg>
+      {/* Hand-built (react-icons has no hatched moon): the Feather crescent, filled with the
+          same diagonal hatching as the landing page line art. */}
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
         className={`${ICON_CLASS} rotate-90 scale-0 opacity-0 light:rotate-0 light:scale-100 light:opacity-100`}
-        strokeWidth={1.75}
         aria-hidden
-      />
+      >
+        <defs>
+          <pattern
+            id="moon-hatch"
+            width={3}
+            height={3}
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(45)"
+          >
+            <line x1={0} y1={0} x2={0} y2={3} stroke="currentColor" strokeWidth={1} />
+          </pattern>
+          {/* Hatch only the lower half, like a partly filled streak bar. */}
+          <clipPath id="moon-half">
+            <rect x={0} y={12} width={24} height={12} />
+          </clipPath>
+        </defs>
+        <path
+          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+          fill="url(#moon-hatch)"
+          clipPath="url(#moon-half)"
+        />
+        <path
+          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+          stroke="currentColor"
+          strokeWidth={1.75}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
       <span className="sr-only light:hidden">Switch to light theme</span>
       <span className="sr-only hidden light:inline">Switch to dark theme</span>
     </button>

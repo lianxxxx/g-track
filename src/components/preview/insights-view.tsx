@@ -1,5 +1,3 @@
-import { FiAward, FiCalendar, FiSun } from "react-icons/fi";
-
 /* Event types summed into each week's total. */
 const eventTypes = [
   { key: "commits", label: "Commits" },
@@ -36,39 +34,36 @@ const totalEvents = weekTotals.reduce((sum, total) => sum + total, 0);
 const recaps = [
   {
     period: "Today",
-    icon: FiSun,
-    line: "3 commits. You larped as a 10x dev and honestly? Convincing.",
+    line: "3 commits. 10x dev cosplay.",
   },
   {
     period: "This week",
-    icon: FiCalendar,
-    line: `${weekTotals[weekTotals.length - 1]} events, down from your ${weekTotals[peakWeek]} peak. We noticed.`,
+    line: `${weekTotals[weekTotals.length - 1]} events, down from ${weekTotals[peakWeek]}. Noted.`,
   },
   {
     period: "This year",
-    icon: FiAward,
-    line: `${totalEvents} events and zero finished side projects. Iconic.`,
+    line: `${totalEvents} events, zero shipped side projects.`,
   },
 ];
 
+/** Recap as a vertical timeline; the latest period gets the filled node. */
 export function Recap() {
   return (
-    <div>
-      <ul className="-mt-2 flex flex-col divide-y divide-glass-border">
-        {recaps.map((recap) => (
-          <li key={recap.period} className="flex gap-3 py-3 last:pb-0">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-glass-border text-brand-300">
-              <recap.icon className="h-4 w-4" strokeWidth={1.75} />
-            </span>
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-wider text-brand-400">
-                {recap.period}
-              </p>
-              <p className="mt-1 text-sm leading-6 text-brand-100">{recap.line}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ol className="relative flex flex-col gap-4">
+      <span className="absolute top-2 bottom-2 left-[7px] w-px bg-brand-700" />
+      {recaps.map((recap, index) => (
+        <li key={recap.period} className="relative pl-7">
+          <span
+            className={`absolute top-0.5 left-0 h-[15px] w-[15px] rounded-full border-2 ${
+              index === recaps.length - 1
+                ? "border-brand-50 bg-brand-50"
+                : "border-brand-600 bg-brand-950"
+            }`}
+          />
+          <p className="text-sm font-medium text-brand-50">{recap.period}</p>
+          <p className="mt-0.5 text-sm text-brand-300">{recap.line}</p>
+        </li>
+      ))}
+    </ol>
   );
 }

@@ -2,16 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FiCompass, FiHelpCircle, FiLayers, FiMenu, FiX } from "react-icons/fi";
+import { FiX } from "react-icons/fi";
 
 import { BrandLogo } from "@/components/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-/* Icons show in the mobile menu only; the desktop pill nav stays text. */
 const navLinks = [
-  { label: "Explore", href: "#features", icon: FiCompass },
-  { label: "How it works", href: "#how-it-works", icon: FiLayers },
-  { label: "FAQ", href: "#faq", icon: FiHelpCircle },
+  { label: "Explore", href: "#features" },
+  { label: "How it works", href: "#how-it-works" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 export function SiteHeader() {
@@ -54,7 +53,7 @@ export function SiteHeader() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 mt-6 bg-brand-950/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 mt-6 bg-page/70 backdrop-blur-xl">
       <div className="relative mx-auto grid h-16 w-full max-w-6xl grid-cols-[1fr_auto_1fr] items-center px-6">
         <Link
           href="/"
@@ -65,7 +64,7 @@ export function SiteHeader() {
 
         <nav
           aria-label="Main"
-          className="col-start-2 hidden items-center gap-1 rounded-full border border-glass-border bg-glass p-1.5 backdrop-blur-xl md:flex"
+          className="col-start-2 hidden items-center gap-1 md:flex"
         >
           {navLinks.map((link) => {
             const isActive = activeId === link.href.slice(1);
@@ -76,8 +75,8 @@ export function SiteHeader() {
                 aria-current={isActive ? "location" : undefined}
                 className={`rounded-full px-4 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
                   isActive
-                    ? "text-accent-primary"
-                    : "text-brand-300 hover:text-accent-primary"
+                    ? "text-brand-50"
+                    : "text-brand-300 hover:text-brand-50"
                 }`}
               >
                 {link.label}
@@ -104,11 +103,20 @@ export function SiteHeader() {
             className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand-100 transition-colors hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary md:hidden"
           >
             {/* Both icons stay mounted so they can rotate past each other, like the theme toggle. */}
-            <FiMenu
-              className={`absolute h-5 w-5 transition-[rotate,scale,opacity] duration-300 ease-out motion-reduce:transition-none ${menuOpen ? "rotate-90 scale-0 opacity-0" : ""}`}
+            {/* Hand-built menu icon in the line-art style: ink strokes of uneven length. */}
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
               strokeWidth={1.75}
+              strokeLinecap="round"
+              className={`absolute h-5 w-5 transition-[rotate,scale,opacity] duration-300 ease-out motion-reduce:transition-none ${menuOpen ? "rotate-90 scale-0 opacity-0" : ""}`}
               aria-hidden
-            />
+            >
+              <line x1={3} y1={6} x2={21} y2={6} />
+              <line x1={3} y1={12} x2={14} y2={12} />
+              <line x1={3} y1={18} x2={18} y2={18} />
+            </svg>
             <FiX
               className={`absolute h-5 w-5 transition-[rotate,scale,opacity] duration-300 ease-out motion-reduce:transition-none ${menuOpen ? "" : "-rotate-90 scale-0 opacity-0"}`}
               strokeWidth={1.75}
@@ -131,13 +139,12 @@ export function SiteHeader() {
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
                     aria-current={isActive ? "location" : undefined}
-                    className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
+                    className={`flex items-center rounded-xl px-4 py-3 text-base transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
                       isActive
-                        ? "text-accent-primary"
-                        : "text-brand-200 hover:text-accent-primary"
+                        ? "text-brand-50"
+                        : "text-brand-200 hover:text-brand-50"
                     }`}
                   >
-                    <link.icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
                     {link.label}
                   </a>
                 );

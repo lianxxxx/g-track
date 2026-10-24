@@ -1,5 +1,32 @@
 import Link from "next/link";
 
+/* Same hatching as the bento's streak bar. */
+const inkHatch =
+  "bg-[repeating-linear-gradient(135deg,var(--brand-50)_0_1.5px,transparent_1.5px_6px)]";
+
+/* A row of contribution cells, drawn like the hero graph; the middle one is solid ink and a size up: you. */
+const spotlightRow = [0, 1, 0, 2, 0, 1, 3, -1, 3, 1, 0, 2, 0, 1, 0];
+const spotlightCell = [
+  "border border-brand-800",
+  "border border-brand-600",
+  `border border-brand-400 ${inkHatch}`,
+  `border border-brand-50 ${inkHatch}`,
+];
+
+function SpotlightArt() {
+  return (
+    <div aria-hidden className="mt-10 flex items-center gap-1.5">
+      {spotlightRow.map((level, index) =>
+        level === -1 ? (
+          <span key={index} className="mx-1 h-6 w-6 rounded-md bg-brand-50" />
+        ) : (
+          <span key={index} className={`h-4 w-4 rounded-[3px] ${spotlightCell[level]}`} />
+        ),
+      )}
+    </div>
+  );
+}
+
 /** Closing pitch after the FAQ: the last push before the footer. */
 export function CtaSection() {
   return (
@@ -14,6 +41,7 @@ export function CtaSection() {
         <p className="mt-4 max-w-2xl text-pretty text-lg leading-8 text-brand-300">
           You already did the hard part. g-track just makes it look iconic.
         </p>
+        <SpotlightArt />
 
         <Link
           href="/login"

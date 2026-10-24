@@ -43,16 +43,39 @@ export function HowItWorks() {
         <ol className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
           {steps.map((step, index) => (
             <li key={step.title} className="relative flex gap-4 md:block">
-              {/* Timeline to the next step: down the left on phones, across on desktop. */}
+              {/* Path to the next step: a plain line down on phones, and on desktop the same ink
+                  zigzag as the bento's Thursday chart. The last step is filled in like
+                  the recap timeline's latest node, since that's where you end up. */}
               {index < steps.length - 1 && (
-                <span
-                  aria-hidden
-                  className="absolute -bottom-8 left-4 top-10 w-px bg-glass-border md:bottom-auto md:left-[calc(50%+1.5rem)] md:right-[calc(-50%-0.5rem)] md:top-4 md:h-px md:w-auto"
-                />
+                <>
+                  <span
+                    aria-hidden
+                    className="absolute -bottom-8 left-4 top-10 w-px bg-brand-600 md:hidden"
+                  />
+                  <span
+                    aria-hidden
+                    className="absolute top-1 right-[calc(-50%-0.5rem)] left-[calc(50%+1.5rem)] hidden h-6 text-brand-50 md:block"
+                  >
+                    <svg viewBox="0 0 100 24" preserveAspectRatio="none" className="h-full w-full overflow-visible">
+                      <polyline
+                        points="0,12 20,9 34,14 50,4 66,11 82,19 100,12"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.5}
+                        strokeLinejoin="round"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    </svg>
+                  </span>
+                </>
               )}
               <span
                 aria-hidden
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-glass-border text-brand-300 md:mx-auto"
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border md:mx-auto ${
+                  index === steps.length - 1
+                    ? "border-brand-50 bg-brand-50 text-brand-950"
+                    : "border-glass-border text-brand-300"
+                }`}
               >
                 <step.icon className="h-4 w-4" strokeWidth={1.75} />
               </span>

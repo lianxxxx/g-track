@@ -69,7 +69,25 @@ const levels: number[] = Array.from({ length: WEEKS * DAYS }, (_, index) => {
    Shared with the dashboard heatmap so both graphs read the same. */
 export const squareColor = ["border border-brand-800", "bg-brand-700", "bg-brand-500", "bg-brand-300", "bg-brand-50"];
 
-const columns = "grid-cols-[repeat(48,minmax(0,1fr))]";
+/* Hero-only cells, drawn in the bento's line-art language: hairline outlines, hatching that
+   gets denser with activity, and solid ink reserved for the peak days. */
+const heroCell = [
+  "border border-brand-800",
+  "border border-brand-600",
+  "border border-brand-400 bg-[repeating-linear-gradient(135deg,var(--brand-400)_0_1px,transparent_1px_5px)]",
+  "border border-brand-50 bg-[repeating-linear-gradient(135deg,var(--brand-50)_0_1px,transparent_1px_3px)]",
+  "bg-brand-50",
+];
+
+/* Phones show only the latest half of the year so each cell is big enough (~11px)
+   for the outlines and hatching; at 48 weeks they shrink to ~6px and read as rings. */
+const MOBILE_WEEKS = 24;
+const mobileStart = WEEKS - MOBILE_WEEKS;
+const mobileMonthLabels = monthLabels
+  .filter((entry) => entry.week >= mobileStart)
+  .map((entry) => ({ ...entry, week: entry.week - mobileStart }));
+
+const columns = "grid-cols-[repeat(24,minmax(0,1fr))] sm:grid-cols-[repeat(48,minmax(0,1fr))]";
 const cellGap = "gap-[3px] sm:gap-1";
 const weekdayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
 
@@ -79,17 +97,26 @@ export function ContributionGraph() {
     <div aria-hidden className="w-full text-left">
       <div className="grid grid-cols-[auto_1fr] gap-x-2">
         <span />
-        <div className={`mb-2 grid ${columns} text-[10px] leading-none text-brand-400 sm:text-xs`}>
-          {monthLabels.map((entry) => (
-            <span
-              key={entry.week}
-              className="whitespace-nowrap"
-              style={{ gridColumn: `${entry.week + 1} / span 3` }}
-            >
-              {entry.label}
-            </span>
-          ))}
-        </div>
+        {/* Month labels per breakpoint, since grid placement is inline and can't be responsive. */}
+        {[
+          { labels: mobileMonthLabels, className: "grid sm:hidden" },
+          { labels: monthLabels, className: "hidden sm:grid" },
+        ].map((row) => (
+          <div
+            key={row.className}
+            className={`mb-2 ${row.className} ${columns} text-[10px] leading-none text-brand-400 sm:text-xs`}
+          >
+            {row.labels.map((entry) => (
+              <span
+                key={entry.week}
+                className="whitespace-nowrap"
+                style={{ gridColumn: `${entry.week + 1} / span 3` }}
+              >
+                {entry.label}
+              </span>
+            ))}
+          </div>
+        ))}
 
         <div className={`hidden grid-rows-7 ${cellGap} text-xs leading-none text-brand-400 sm:grid`}>
           {weekdayLabels.map((label, index) => (
@@ -101,7 +128,12 @@ export function ContributionGraph() {
 
         <div className={`col-start-2 grid grid-flow-col grid-rows-7 ${columns} ${cellGap}`}>
           {levels.map((level, index) => (
-            <span key={index} className={`aspect-square rounded-[3px] ${squareColor[level]}`} />
+            <span
+              key={index}
+              className={`aspect-square rounded-[3px] ${heroCell[level]} ${
+                index < mobileStart * DAYS ? "hidden sm:block" : ""
+              }`}
+            />
           ))}
         </div>
       </div>

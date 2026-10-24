@@ -53,7 +53,7 @@ export function SplashScreen() {
   return (
     <div
       aria-hidden={phase === "leaving"}
-      className={`fixed inset-0 z-[60] flex flex-col bg-brand-950 transition-opacity duration-300 ease-out motion-reduce:transition-none ${phase === "leaving" ? "opacity-0" : "opacity-100"}`}
+      className={`fixed inset-0 z-[60] flex flex-col bg-page transition-opacity duration-300 ease-out motion-reduce:transition-none ${phase === "leaving" ? "opacity-0" : "opacity-100"}`}
     >
       <LoadingScreen />
     </div>
