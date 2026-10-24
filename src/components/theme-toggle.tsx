@@ -53,16 +53,28 @@ function toggleTheme(event: MouseEvent<HTMLButtonElement>) {
     });
 }
 
+/* Both icons stay mounted and stacked so they can rotate and scale past each other. */
+const ICON_CLASS =
+  "absolute h-4.5 w-4.5 transition-[rotate,scale,opacity] duration-300 ease-out motion-reduce:transition-none";
+
 /** Icon and accessible name switch via the `light:` variant, so SSR markup matches whatever theme is stored. */
 export function ThemeToggle() {
   return (
     <button
       type="button"
       onClick={toggleTheme}
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-glass-border bg-glass text-brand-100 transition-colors hover:border-brand-600 hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary"
+      className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand-100 transition-colors hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary"
     >
-      <FiSun className="h-4.5 w-4.5 light:hidden" strokeWidth={1.75} aria-hidden />
-      <FiMoon className="hidden h-4.5 w-4.5 light:block" strokeWidth={1.75} aria-hidden />
+      <FiSun
+        className={`${ICON_CLASS} light:-rotate-90 light:scale-0 light:opacity-0`}
+        strokeWidth={1.75}
+        aria-hidden
+      />
+      <FiMoon
+        className={`${ICON_CLASS} rotate-90 scale-0 opacity-0 light:rotate-0 light:scale-100 light:opacity-100`}
+        strokeWidth={1.75}
+        aria-hidden
+      />
       <span className="sr-only light:hidden">Switch to light theme</span>
       <span className="sr-only hidden light:inline">Switch to dark theme</span>
     </button>

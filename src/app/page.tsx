@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ContributionGraph } from "@/components/contribution-graph";
+import { CtaSection } from "@/components/cta-section";
 import { FaqSection, faqs } from "@/components/faq-section";
 import { HowItWorks } from "@/components/how-it-works";
 import { PreviewSection } from "@/components/preview/preview-section";
@@ -61,15 +62,15 @@ export default function Home() {
             </h1>
 
             <p className="mt-6 max-w-md text-pretty text-base leading-7 text-brand-300 sm:text-lg sm:leading-8">
-              Start larping as the main character. Your commits, PRs, issues,
-              and reviews, all glowing on one board.
+              You&apos;re the main character. Act like it. Your commits, PRs,
+              issues, and reviews, all glowing on one board.
             </p>
 
             <Link
               href="/login"
               className="mt-9 flex h-12 items-center rounded-full bg-accent-primary px-7 text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
             >
-              Start tracking
+              Start larping
             </Link>
 
             <div className="mt-16 w-full sm:mt-20">
@@ -80,6 +81,7 @@ export default function Home() {
         <PreviewSection />
         <HowItWorks />
         <FaqSection />
+        <CtaSection />
       </main>
       <SiteFooter />
     </>

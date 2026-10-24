@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FiCompass, FiHelpCircle, FiLayers } from "react-icons/fi";
+import { FiCompass, FiHelpCircle, FiLayers, FiMenu, FiX } from "react-icons/fi";
 
 import { BrandLogo } from "@/components/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -76,8 +76,8 @@ export function SiteHeader() {
                 aria-current={isActive ? "location" : undefined}
                 className={`rounded-full px-4 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
                   isActive
-                    ? "bg-brand-800 font-medium text-brand-50 light:bg-brand-900"
-                    : "text-brand-300 hover:bg-brand-800/60 hover:text-brand-50 light:hover:bg-brand-900/60"
+                    ? "text-accent-primary"
+                    : "text-brand-300 hover:text-accent-primary"
                 }`}
               >
                 {link.label}
@@ -101,16 +101,19 @@ export function SiteHeader() {
             aria-controls="mobile-menu"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             onClick={() => setMenuOpen((open) => !open)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-glass-border bg-glass transition-colors hover:border-brand-600 focus-visible:outline-2 focus-visible:outline-accent-primary md:hidden"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-brand-100 transition-colors hover:text-brand-50 focus-visible:outline-2 focus-visible:outline-accent-primary md:hidden"
           >
-            <span className="flex h-4 w-4 flex-col items-center justify-center gap-[5px]">
-              <span
-                className={`h-0.5 w-4 rounded-full bg-brand-50 transition-transform duration-200 ${menuOpen ? "translate-y-[3.5px] rotate-45" : ""}`}
-              />
-              <span
-                className={`h-0.5 w-4 rounded-full bg-brand-50 transition-transform duration-200 ${menuOpen ? "-translate-y-[3.5px] -rotate-45" : ""}`}
-              />
-            </span>
+            {/* Both icons stay mounted so they can rotate past each other, like the theme toggle. */}
+            <FiMenu
+              className={`absolute h-5 w-5 transition-[rotate,scale,opacity] duration-300 ease-out motion-reduce:transition-none ${menuOpen ? "rotate-90 scale-0 opacity-0" : ""}`}
+              strokeWidth={1.75}
+              aria-hidden
+            />
+            <FiX
+              className={`absolute h-5 w-5 transition-[rotate,scale,opacity] duration-300 ease-out motion-reduce:transition-none ${menuOpen ? "" : "-rotate-90 scale-0 opacity-0"}`}
+              strokeWidth={1.75}
+              aria-hidden
+            />
           </button>
         </div>
 
@@ -130,8 +133,8 @@ export function SiteHeader() {
                     aria-current={isActive ? "location" : undefined}
                     className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
                       isActive
-                        ? "bg-brand-800 font-medium text-brand-50 light:bg-brand-900"
-                        : "text-brand-200 hover:bg-brand-800/60 hover:text-brand-50 light:hover:bg-brand-900/60"
+                        ? "text-accent-primary"
+                        : "text-brand-200 hover:text-accent-primary"
                     }`}
                   >
                     <link.icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />

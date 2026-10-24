@@ -3,8 +3,8 @@ import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
 import { site } from "@/lib/site";
 
-/** Closing call to action plus sign-off: no border, no nav (the sticky header already
- *  carries it). Whitespace from the FAQ section above is the only separator. */
+/** Sign-off only: no border, no nav (the sticky header already carries it), no button
+ *  (the CTA section above is the closing call to action). */
 export function SiteFooter() {
   return (
     <footer className="px-6 pb-12 pt-4">
@@ -20,14 +20,7 @@ export function SiteFooter() {
           Your GitHub, but make it <span className="italic">iconic.</span>
         </p>
 
-        <Link
-          href="/login"
-          className="mt-5 flex h-11 items-center rounded-full bg-accent-primary px-6 text-sm font-medium text-brand-950 transition-colors hover:bg-accent-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-primary"
-        >
-          Sign in
-        </Link>
-
-        <p className="mt-10 text-xs text-brand-300">
+        <p className="mt-8 text-xs text-brand-300">
           © {new Date().getFullYear()} {site.name}
         </p>
       </div>
