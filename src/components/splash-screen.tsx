@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { LoadingScreen } from "@/components/loading-screen";
 
 const FADE_MS = 300;
+/* The loading bar runs to full (200ms in LoadingScreen) before the fade starts. */
+const FINISH_MS = 200;
 /* Safety cap: leave even if load/fonts never settle (e.g. tab opened in the background). */
 const MAX_WAIT_MS = 4000;
 
@@ -35,7 +37,7 @@ export function SplashScreen() {
 
   useEffect(() => {
     if (phase !== "leaving") return;
-    const done = setTimeout(() => setPhase("done"), FADE_MS);
+    const done = setTimeout(() => setPhase("done"), FINISH_MS + FADE_MS);
     return () => clearTimeout(done);
   }, [phase]);
 
@@ -53,9 +55,9 @@ export function SplashScreen() {
   return (
     <div
       aria-hidden={phase === "leaving"}
-      className={`fixed inset-0 z-[60] flex flex-col bg-page transition-opacity duration-300 ease-out motion-reduce:transition-none ${phase === "leaving" ? "opacity-0" : "opacity-100"}`}
+      className={`fixed inset-0 z-[60] flex flex-col bg-page transition-opacity duration-300 ease-out motion-reduce:transition-none ${phase === "leaving" ? "opacity-0 delay-200" : "opacity-100"}`}
     >
-      <LoadingScreen />
+      <LoadingScreen done={phase === "leaving"} />
     </div>
   );
 }
