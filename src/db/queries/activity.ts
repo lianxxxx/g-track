@@ -1,18 +1,14 @@
-import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, notInArray, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
   activityEvents,
   contributionDays,
-  dailyStats,
   integrations,
   projects,
 } from "@/db/schema/app";
 import type { NormalizedEvent } from "@/lib/github/activity";
 import type { ContributionDay } from "@/lib/github/contributions";
-
-/** The UTC calendar day of an event, matching daily_stats.day. */
-const utcDay = sql<string>`(${activityEvents.occurredAt} AT TIME ZONE 'utc')::date`;
 
 /** Upsert the per-user GitHub integration row. */
 function saveIntegration(
@@ -49,12 +45,12 @@ function markSynced(userId: string) {
 }
 
 /**
- * Store a batch of normalized events for a user and refresh their aggregates.
+ * Store a batch of normalized events for a user.
  *
  * neon-http has no transactions, so every step is idempotent and ordered to
  * stay safe if a later one fails: projects and events dedup on their unique
- * indexes, daily_stats is recomputed from the stored events rather than
- * incremented, and the integration row is marked synced last.
+ * indexes, rebased commit copies are pruned after the insert, and the
+ * integration row is marked synced last.
  */
 export async function storeActivity(userId: string, events: NormalizedEvent[]) {
   const repos = new Map(
@@ -118,8 +114,7 @@ export async function storeActivity(userId: string, events: NormalizedEvent[]) {
     })
     .returning({ id: activityEvents.id });
 
-  const days = [...new Set(rows.map((row) => toUtcDay(row.occurredAt)))];
-  await recomputeDailyStats(userId, days);
+  await removeRebasedCommits(userId);
 
   await markSynced(userId);
 
@@ -131,31 +126,36 @@ function toUtcDay(date: Date) {
 }
 
 /**
- * Recount the given days from activity_events. Events are only ever added, so
- * counts only grow and no stale rows are left behind.
+ * A rebase or amend gives a commit a new sha but keeps its authored date and
+ * message, and the Events API reports both the old and the new push. Keep the
+ * first stored copy per (project, authored date, subject) and delete the rest.
+ * Keeping the oldest row means an old sha fetched again later is the one that
+ * goes, so the result is stable across syncs.
  */
-async function recomputeDailyStats(userId: string, days: string[]) {
-  if (days.length === 0) return;
+async function removeRebasedCommits(userId: string) {
+  const ownCommits = and(
+    eq(activityEvents.userId, userId),
+    eq(activityEvents.type, "commit"),
+  );
 
-  const counts = await db
-    .select({
-      day: utcDay.as("day"),
-      type: activityEvents.type,
-      count: sql<number>`count(*)::int`,
-    })
+  const firstCopies = db
+    .selectDistinctOn(
+      [activityEvents.projectId, activityEvents.occurredAt, activityEvents.title],
+      { id: activityEvents.id },
+    )
     .from(activityEvents)
-    .where(and(eq(activityEvents.userId, userId), inArray(utcDay, days)))
-    .groupBy(utcDay, activityEvents.type);
-
-  if (counts.length === 0) return;
+    .where(ownCommits)
+    .orderBy(
+      activityEvents.projectId,
+      activityEvents.occurredAt,
+      activityEvents.title,
+      asc(activityEvents.createdAt),
+      asc(activityEvents.id),
+    );
 
   await db
-    .insert(dailyStats)
-    .values(counts.map((row) => ({ userId, ...row })))
-    .onConflictDoUpdate({
-      target: [dailyStats.userId, dailyStats.day, dailyStats.type],
-      set: { count: sql`excluded.count`, updatedAt: new Date() },
-    });
+    .delete(activityEvents)
+    .where(and(ownCommits, notInArray(activityEvents.id, firstCopies)));
 }
 
 /**

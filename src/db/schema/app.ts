@@ -93,30 +93,6 @@ export const activityEvents = pgTable(
 );
 
 /**
- * Per-user, per-day, per-type aggregates derived from activity_events. Powers
- * the heatmap. Note: deleting a project cascades its activity_events away but
- * not these rows - a project-removal flow must recompute the affected user's
- * aggregates in the same operation.
- */
-export const dailyStats = pgTable(
-  "daily_stats",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-    /** UTC calendar day of occurred_at. */
-    day: date("day").notNull(),
-    type: activityType("type").notNull(),
-    count: integer("count").notNull().default(0),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (t) => [uniqueIndex("daily_stats_user_day_type_idx").on(t.userId, t.day, t.type)],
-);
-
-/**
  * Per-user daily counts from GitHub's contribution calendar: the numbers behind
  * the graph on a GitHub profile. Unlike activity_events (a ~90 day rolling
  * window, public repos only), this covers a full year and includes private

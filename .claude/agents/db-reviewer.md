@@ -12,10 +12,10 @@ Run `git diff` scoped to `src/db/` (plus `git status` for new files). Read the f
 
 ## Checks
 
-- **Schema matches the architecture**: the planned model is: Better Auth-owned auth tables, `projects`, `activity_events` (the core normalized event table), `daily_stats` (per-user per-day aggregates), and integrations/sync state. Flag tables or columns that don't trace back to it, and speculative columns for unbuilt sources (CLI, Claude Code, Codex), the `source` column is the only allowed concession.
+- **Schema matches the architecture**: the planned model is: Better Auth-owned auth tables, `projects`, `activity_events` (the core normalized event table), `contribution_days` (the GitHub contribution calendar), and integrations/sync state. Flag tables or columns that don't trace back to it, and speculative columns for unbuilt sources (CLI, Claude Code, Codex), the `source` column is the only allowed concession.
 - **activity_events integrity**: `external_id` must support dedup (unique constraint per source), `occurred_at` and `user_id` must be indexed: the heatmap and dashboard query by user and date range constantly.
 - **Migrations**: generated migrations match the schema; destructive changes (drops, type narrowing) are called out explicitly; migration order is safe.
-- **Query functions**: live in `src/db/`, typed from the schema (no hand-written row types drifting from it), no N+1 patterns for dashboard reads, aggregates read from `daily_stats` rather than scanning `activity_events`.
+- **Query functions**: live in `src/db/`, typed from the schema (no hand-written row types drifting from it), no N+1 patterns for dashboard reads, heatmap and stats read from `contribution_days` rather than scanning `activity_events`.
 - **Boundaries**: no raw SQL and no DB client usage outside `src/db/`. Grep for it; don't trust the diff alone.
 - **Safety**: no credentials or connection strings in source; `DATABASE_URL` style env vars only.
 
