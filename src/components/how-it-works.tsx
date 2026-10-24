@@ -26,7 +26,7 @@ export function HowItWorks() {
       aria-labelledby="how-it-works-heading"
       className="scroll-mt-28 px-6 py-24 sm:py-28"
     >
-      <div className="mx-auto w-full max-w-4xl">
+      <div className="mx-auto w-full max-w-5xl">
         <div className="flex flex-col items-center text-center">
           <h2
             id="how-it-works-heading"

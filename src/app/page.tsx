@@ -55,7 +55,7 @@ export default function Home() {
       />
       <main className="flex-1">
         <div className="px-6 pb-12 pt-14 sm:pt-20">
-          <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center text-center">
+          <div className="relative mx-auto flex w-full max-w-5xl flex-col items-center text-center">
             <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-brand-50 sm:text-5xl lg:whitespace-nowrap">
               Your GitHub, but make it{" "}
               <span className="italic">iconic.</span>
@@ -73,7 +73,7 @@ export default function Home() {
               Start larping
             </Link>
 
-            <div className="mt-16 w-full sm:mt-20">
+            <div className="mt-16 w-full max-w-4xl sm:mt-20">
               <ContributionGraph />
             </div>
           </div>

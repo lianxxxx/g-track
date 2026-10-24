@@ -31,7 +31,7 @@ function SpotlightArt() {
 export function CtaSection() {
   return (
     <section aria-labelledby="cta-heading" className="px-6 py-24 sm:py-28">
-      <div className="mx-auto flex w-full max-w-4xl flex-col items-center text-center">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center text-center">
         <h2
           id="cta-heading"
           className="max-w-xl text-balance text-3xl font-semibold tracking-tight sm:text-4xl"
