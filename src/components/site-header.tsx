@@ -1,16 +1,81 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { FiX } from "react-icons/fi";
 
 import { BrandLogo } from "@/components/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
+/* Mobile menu icons in the line-art style of the theme toggle: Feather outlines whose main
+   shape is hatched on the lower half. Hand-built because react-icons can't hatch. */
+function ArtIcon({ id, hatched, children }: { id: string; hatched: ReactNode; children: ReactNode }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4 shrink-0"
+      aria-hidden
+    >
+      <defs>
+        <pattern
+          id={`${id}-hatch`}
+          width={3}
+          height={3}
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(45)"
+        >
+          <line x1={0} y1={0} x2={0} y2={3} strokeWidth={1} />
+        </pattern>
+        <clipPath id={`${id}-half`}>
+          <rect x={0} y={12} width={24} height={12} />
+        </clipPath>
+      </defs>
+      <g fill={`url(#${id}-hatch)`} stroke="none" clipPath={`url(#${id}-half)`}>
+        {hatched}
+      </g>
+      {children}
+    </svg>
+  );
+}
+
 const navLinks = [
-  { label: "Explore", href: "#features" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "FAQ", href: "#faq" },
+  {
+    label: "Explore",
+    href: "#features",
+    icon: (
+      <ArtIcon id="nav-explore" hatched={<circle cx={12} cy={12} r={10} />}>
+        <circle cx={12} cy={12} r={10} />
+        <path d="M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z" />
+      </ArtIcon>
+    ),
+  },
+  {
+    label: "How it works",
+    href: "#how-it-works",
+    icon: (
+      <ArtIcon id="nav-how" hatched={<path d="M2 17l10 5 10-5-10-5z" />}>
+        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+        <path d="M2 17l10 5 10-5" />
+        <path d="M2 12l10 5 10-5" />
+      </ArtIcon>
+    ),
+  },
+  {
+    label: "FAQ",
+    href: "#faq",
+    icon: (
+      <ArtIcon id="nav-faq" hatched={<circle cx={12} cy={12} r={10} />}>
+        <circle cx={12} cy={12} r={10} />
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+        <path d="M12 17h.01" />
+      </ArtIcon>
+    ),
+  },
 ];
 
 export function SiteHeader() {
@@ -139,12 +204,13 @@ export function SiteHeader() {
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
                     aria-current={isActive ? "location" : undefined}
-                    className={`flex items-center rounded-xl px-4 py-3 text-base transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
+                    className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base transition-colors focus-visible:outline-2 focus-visible:outline-accent-primary ${
                       isActive
                         ? "text-brand-50"
                         : "text-brand-200 hover:text-brand-50"
                     }`}
                   >
+                    {link.icon}
                     {link.label}
                   </a>
                 );
