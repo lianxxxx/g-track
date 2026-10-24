@@ -16,7 +16,7 @@ Deeper context: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (system design, dat
 
 ## Stack
 
-Next.js (App Router) · TypeScript · Tailwind CSS · GitHub OAuth + API · Neon PostgreSQL · Drizzle ORM · Better Auth · Zod · Recharts
+Next.js (App Router) · TypeScript · Tailwind CSS · GitHub OAuth + API · Neon PostgreSQL · Drizzle ORM · Better Auth · Zod
 
 Planned later (do not build ahead of time): Node.js TypeScript CLI, Claude Code activity integration, Codex integration.
 

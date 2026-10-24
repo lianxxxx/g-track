@@ -14,17 +14,17 @@ g-track is a developer activity tracking app. It pulls a developer's activity fr
 
 ## Stack
 
-Next.js (App Router) · TypeScript · Tailwind CSS · Neon PostgreSQL · Drizzle ORM · Better Auth · GitHub OAuth/API via Octokit · Zod · Recharts
+Next.js (App Router) · TypeScript · Tailwind CSS · Neon PostgreSQL · Drizzle ORM · Better Auth · GitHub OAuth/API via Octokit · Zod
 
 ## Layers
 
 | Layer | Lives in | Responsibility |
 |---|---|---|
 | Routes & pages | `src/app/` | Pages, layouts, API route handlers. Server Components read data through `src/db/` queries. No external API calls from UI code. |
-| Components | `src/components/` | Presentational UI and Recharts charts (heatmap, activity charts). No data access. |
+| Components | `src/components/` | Presentational UI and hand-built SVG charts (heatmap, stat charts). No data access. |
 | Auth | `src/lib/auth*` | Better Auth config, GitHub OAuth provider, session helpers, access to the stored GitHub token. |
 | GitHub integration | `src/lib/github*` | Octokit client, fetching activity, mapping GitHub payloads → `activity_events`. The only place that knows GitHub API shapes. |
-| Sync | `src/app/api/sync` | Orchestrates fetch → normalize → store: the contribution calendar into `contribution_days`, events into `activity_events` (recomputing `daily_stats`), then updates sync state. |
+| Sync | `src/app/api/sync` | Orchestrates fetch → normalize → store: the contribution calendar into `contribution_days`, events into `activity_events` (pruning rebased commit copies), then updates sync state. |
 | Database | `src/db/` | Drizzle schema, migrations, query functions. The only layer that touches the database. |
 | Validation | Zod at boundaries | Route bodies, env vars, any untrusted input. GitHub responses use Octokit's types, not re-validation. |
 | Types | `src/types/` | Shared TypeScript types not derived from schema. |
@@ -47,9 +47,9 @@ Sync (server)
   │
   ▼
 Drizzle queries (src/db) ──► Neon Postgres
-  │     users/auth · projects · activity_events · daily_stats · contribution_days · integrations
+  │     users/auth · projects · activity_events · contribution_days · integrations
   ▼
-Dashboard (src/app + src/components, Recharts)
+Dashboard (src/app + src/components)
         heatmap · activity charts
 ```
 
@@ -58,7 +58,6 @@ Dashboard (src/app + src/components, Recharts)
 - **users / auth tables**: owned by Better Auth (user, session, account incl. GitHub token, verification).
 - **projects**: the unit activity is attributed to (a GitHub repository for now), linked to a user.
 - **activity_events**: the normalized event model and the core of the system. One row per activity: `user_id`, `project_id`, `source` (`github` today), `type` (commit, pr_opened, pr_merged, issue, review, …), `occurred_at`, `external_id` (for dedup), plus minimal metadata. Every source, current and future, feeds this table; the dashboard reads its recent activity list from it.
-- **daily_stats**: per-user, per-day aggregates derived from `activity_events` (counts by type). Kept up to date on every sync; the dashboard no longer reads it (see `contribution_days`).
 - **contribution_days**: per-user daily counts from GitHub's contribution calendar, the numbers behind the graph on a GitHub profile. A full year, and private contributions are included as counts when the user has "Include private contributions on my profile" on. Powers the heatmap and the dashboard stats (total, streak, busiest day).
 - **integrations / sync state**: per-user, per-source connection and sync cursor (`last_synced_at`, last seen event, status) so fetches are incremental and failures are visible.
 

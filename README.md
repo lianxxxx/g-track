@@ -6,7 +6,11 @@ Sign-in is handled through GitHub OAuth. Each user's dashboard is private; only 
 
 ## Status
 
-Early development. The project structure, documentation, and SEO foundation are in place. Authentication, GitHub sync, the database schema, and the dashboard are being built next.
+Live at [g-trackph.vercel.app](https://g-trackph.vercel.app). Sign in with GitHub, hit Sync, and the dashboard shows:
+
+- a full-year contribution heatmap (from GitHub's contribution calendar, private contributions included when your profile allows it)
+- total contributions, current streak, and busiest day
+- your recent commits, pull requests, issues, and reviews from about the last 90 days (public repos)
 
 ## Stack
 
@@ -16,7 +20,6 @@ Early development. The project structure, documentation, and SEO foundation are 
 - Better Auth with GitHub OAuth
 - GitHub API via Octokit
 - Zod for validation at boundaries
-- Recharts for data visualization
 
 ## Project structure
 
@@ -31,7 +34,7 @@ Early development. The project structure, documentation, and SEO foundation are 
 
 ## Getting started
 
-Requires Node.js 20 or later.
+Requires Node.js 24 (24.22.1 or later, see `.nvmrc`).
 
 ```bash
 npm install
