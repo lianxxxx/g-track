@@ -3,6 +3,22 @@ import { FiArrowLeft } from "react-icons/fi";
 
 import { BrandMark } from "@/components/brand-logo";
 import { GitHubSignInButton } from "@/components/github-sign-in-button";
+import { inkCell } from "@/components/stat-charts";
+
+/* Your last week as contribution cells, in the hero graph's line art. Today is the solid one,
+   a size up: the square you're about to fill. */
+const week = [1, 0, 2, 1, 3, 2];
+
+function WeekArt() {
+  return (
+    <div aria-hidden className="mt-6 flex items-center gap-1.5">
+      {week.map((level, index) => (
+        <span key={index} className={`h-4 w-4 rounded-[3px] ${inkCell[level]}`} />
+      ))}
+      <span className="ml-1 h-6 w-6 rounded-md bg-brand-50" />
+    </div>
+  );
+}
 
 type Props = {
   /** Present when GitHub bounced back with ?error=... */
@@ -14,7 +30,7 @@ type Props = {
 export function AuthCard({ githubFailed }: Props) {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-16">
-      <div className="flex w-full max-w-sm flex-col items-center rounded-card border border-glass-border bg-glass p-8 text-center backdrop-blur-xl">
+      <div className="flex w-full max-w-sm flex-col items-center rounded-card border border-glass-border p-8 text-center">
         <Link
           href="/"
           className="inline-flex rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-primary"
@@ -25,6 +41,7 @@ export function AuthCard({ githubFailed }: Props) {
         <p className="mt-2 leading-7 text-brand-300">
           Sign in or create your account with GitHub.
         </p>
+        <WeekArt />
 
         {githubFailed && (
           <p
