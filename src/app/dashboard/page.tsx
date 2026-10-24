@@ -1,53 +1,39 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import type { IconType } from "react-icons";
 import {
-  FiAlertCircle,
-  FiCheckCircle,
-  FiEye,
-  FiGitCommit,
+  FiActivity,
+  FiArrowDownRight,
+  FiArrowUpRight,
+  FiCalendar,
+  FiFolder,
   FiGithub,
-  FiGitMerge,
-  FiGitPullRequest,
+  FiGrid,
+  FiLayers,
+  FiZap,
 } from "react-icons/fi";
+import type { IconType } from "react-icons";
 
 import { ActivityHeatmap, levelOf } from "@/components/activity-heatmap";
-import { BrandLogo } from "@/components/brand-logo";
-import { ContributionStrip, StreakTicks, WeekdayBars } from "@/components/stat-charts";
+import { BarList } from "@/components/bar-list";
+import { CardHeading } from "@/components/card-heading";
+import { CodingHours } from "@/components/coding-hours";
+import { DashboardSidebar } from "@/components/dashboard-sidebar";
+import { PeriodMenu } from "@/components/period-menu";
+import { ContributionStrip, InkCurve, StreakBar } from "@/components/stat-charts";
 import { SyncButton } from "@/components/sync-button";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { UserMenu } from "@/components/user-menu";
 import { getActivityOverview } from "@/db/queries/activity";
-import type { ActivityType } from "@/db/schema/app";
 import { getSession } from "@/lib/auth";
+import { parsePeriod, periods, summarizePeriod } from "@/lib/insights";
 
 export const metadata: Metadata = {
   title: "Dashboard",
   robots: { index: false, follow: false },
 };
 
-/* Neutral outlined icons, same as the home page: type reads from the icon, not a color. */
-const eventIcon: Record<ActivityType, IconType> = {
-  commit: FiGitCommit,
-  pr_opened: FiGitPullRequest,
-  pr_merged: FiGitMerge,
-  issue_opened: FiAlertCircle,
-  issue_closed: FiCheckCircle,
-  review: FiEye,
-};
-
-const card = "rounded-card border border-glass-border bg-brand-950";
-
-const eventLabel: Record<ActivityType, string> = {
-  commit: "Commit",
-  pr_opened: "Opened",
-  pr_merged: "Merged",
-  issue_opened: "Issue",
-  issue_closed: "Closed",
-  review: "Reviewed",
-};
+/* No fill: cards are a hairline on the grain canvas, same as the landing bento. */
+const card = "rounded-card border border-glass-border";
 
 const relative = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 const units: [Intl.RelativeTimeFormatUnit, number][] = [
@@ -73,6 +59,8 @@ function timeAgo(date: Date) {
 
 const DAY_MS = 86_400_000;
 const STREAK_GOAL = 30;
+/** Same window the query loads, so the longest streak covers everything on the heatmap. */
+const HEATMAP_DAYS = 371;
 
 /** A little roast about how stale the board is, in the same voice as the home page recap. */
 function syncQuip(lastSyncedAt: Date) {
@@ -84,7 +72,9 @@ function syncQuip(lastSyncedAt: Date) {
 }
 const weekdayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-/** Last 14 days as heatmap levels, the current streak, and per-weekday totals (Monday first). */
+type MonthTrend = { percent: number | null; up: boolean; note: string };
+
+/** Last 14 days as heatmap levels, streaks, the month trend, and per-weekday totals (Monday first). */
 function summarize(daily: { day: string; count: number }[]) {
   const counts = new Map(daily.map((entry) => [entry.day, entry.count]));
   const now = new Date();
@@ -98,6 +88,43 @@ function summarize(daily: { day: string; count: number }[]) {
   let streak = 0;
   for (let daysAgo = countOn(0) > 0 ? 0 : 1; countOn(daysAgo) > 0; daysAgo++) streak++;
 
+  let longestStreak = 0;
+  let run = 0;
+  for (let daysAgo = HEATMAP_DAYS - 1; daysAgo >= 0; daysAgo--) {
+    run = countOn(daysAgo) > 0 ? run + 1 : 0;
+    longestStreak = Math.max(longestStreak, run);
+  }
+
+  // Month to date against the same stretch of last month, so a fresh month isn't unfairly behind.
+  const dayOfMonth = now.getUTCDate();
+  const lastMonthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 0));
+  let thisMonth = 0;
+  let lastMonth = 0;
+  for (let day = 1; day <= dayOfMonth; day++) {
+    thisMonth += countOn(dayOfMonth - day);
+    if (day <= lastMonthEnd.getUTCDate()) {
+      lastMonth +=
+        counts.get(
+          new Date(Date.UTC(lastMonthEnd.getUTCFullYear(), lastMonthEnd.getUTCMonth(), day))
+            .toISOString()
+            .slice(0, 10),
+        ) ?? 0;
+    }
+  }
+  const monthName = lastMonthEnd.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+  const monthTrend: MonthTrend =
+    lastMonth === 0
+      ? {
+          percent: null,
+          up: thisMonth > 0,
+          note: thisMonth > 0 ? `Up from 0 in ${monthName}` : `Quiet since ${monthName}`,
+        }
+      : {
+          percent: Math.round((Math.abs(thisMonth - lastMonth) / lastMonth) * 100),
+          up: thisMonth >= lastMonth,
+          note: `vs ${monthName}, same days`,
+        };
+
   const weekdayTotals = [0, 0, 0, 0, 0, 0, 0];
   for (const entry of daily) {
     const weekday = new Date(`${entry.day}T00:00:00Z`).getUTCDay();
@@ -106,10 +133,40 @@ function summarize(daily: { day: string; count: number }[]) {
   const peak = Math.max(...weekdayTotals);
   const busiestDay = peak > 0 ? weekdayNames[weekdayTotals.indexOf(peak)] : "None";
 
-  return { recentLevels, streak, weekdayTotals, busiestDay };
+  return { recentLevels, streak, longestStreak, monthTrend, weekdayTotals, busiestDay };
 }
 
-export default async function DashboardPage() {
+/** Events per hour (a 1-day window) or per day, oldest first, for the hero's ink line. */
+function bucketize(events: { occurredAt: Date }[], days: number) {
+  const size = days === 1 ? DAY_MS / 24 : DAY_MS;
+  const buckets = Array.from({ length: days === 1 ? 24 : days }, () => 0);
+  const now = Date.now();
+  for (const event of events) {
+    const index = buckets.length - 1 - Math.floor((now - event.occurredAt.getTime()) / size);
+    if (index >= 0) buckets[index]++;
+  }
+  return buckets;
+}
+
+/** Mono delta pill: an arrow and a percent, no green or red. */
+function TrendBadge({ trend }: { trend: MonthTrend }) {
+  if (trend.percent === null) return null;
+  const Arrow = trend.up ? FiArrowUpRight : FiArrowDownRight;
+
+  return (
+    <span className="flex items-center gap-0.5 rounded-full border border-glass-border px-2 py-0.5 text-xs text-brand-100 tabular-nums">
+      <Arrow className="h-3 w-3" strokeWidth={2} aria-hidden />
+      <span className="sr-only">{trend.up ? "Up" : "Down"} </span>
+      {trend.percent}%
+    </span>
+  );
+}
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const session = await getSession();
   if (!session) redirect("/login");
 
@@ -117,183 +174,223 @@ export default async function DashboardPage() {
   // GitHub display names can arrive padded (" Leyanne ").
   const name = user.name.trim();
   const firstName = name.split(/\s+/)[0] || name;
-  const { integration, total, recent, daily } = await getActivityOverview(
-    user.id,
-  );
+  const period = parsePeriod((await searchParams).period);
+  const { integration, total, daily, windowed } = await getActivityOverview(user.id);
 
-  const { recentLevels, streak, weekdayTotals, busiestDay } = summarize(daily);
+  const { recentLevels, streak, longestStreak, monthTrend, weekdayTotals, busiestDay } =
+    summarize(daily);
+  const insights = summarizePeriod(period, windowed);
+  const commitTimes = windowed
+    .filter((event) => event.type === "commit")
+    .map((event) => event.occurredAt.toISOString());
 
-  const stats: { label: string; value: string; unit?: string; chart: ReactNode }[] = [
+  const heroLine = bucketize(insights.events, period.days);
+
+  const stats: {
+    label: string;
+    icon: IconType;
+    value: string;
+    unit?: string;
+    badge?: ReactNode;
+    note: string;
+    chart: ReactNode;
+  }[] = [
     {
       label: "Contributions",
+      icon: FiActivity,
       value: total.toLocaleString("en-US"),
+      badge: <TrendBadge trend={monthTrend} />,
+      note: monthTrend.note,
       chart: <ContributionStrip levels={recentLevels} />,
     },
     {
       label: "Current streak",
+      icon: FiZap,
       value: String(streak),
       unit: streak === 1 ? "day" : "days",
-      chart: <StreakTicks streak={streak} goal={STREAK_GOAL} />,
+      note: `Best: ${longestStreak} ${longestStreak === 1 ? "day" : "days"}`,
+      chart: <StreakBar streak={streak} goal={STREAK_GOAL} />,
     },
     {
       label: "Busiest day",
+      icon: FiCalendar,
       value: busiestDay,
-      chart: <WeekdayBars totals={weekdayTotals} />,
+      note: "Most active weekday this year",
+      chart: (
+        <div className="w-24 text-brand-50">
+          <InkCurve values={weekdayTotals} arrow />
+        </div>
+      ),
     },
   ];
 
   return (
-    <>
-      <header className="mt-6">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
-          <Link
-            href="/"
-            className="flex w-fit items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent-primary"
-          >
-            <BrandLogo priority />
-          </Link>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <UserMenu name={name} email={user.email} image={user.image ?? null} />
-          </div>
-        </div>
-      </header>
+    <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col lg:flex-row">
+      <DashboardSidebar name={name} email={user.email} image={user.image ?? null} />
 
-      <main className="flex flex-1 flex-col px-6 pb-24 pt-14 sm:pt-20">
-        <div className="mx-auto w-full max-w-4xl">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h1 className="text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-brand-50 sm:text-5xl">
-                Hi {firstName}, you&apos;re <span className="italic">in.</span>
-              </h1>
-              <p className="mt-4 text-pretty text-lg leading-8 text-brand-300">
-                {integration?.lastSyncedAt ? (
-                  <>
-                    Last synced{" "}
-                    <span className="font-medium text-brand-50">
-                      {timeAgo(integration.lastSyncedAt)}
-                    </span>
-                    . {syncQuip(integration.lastSyncedAt)}
-                  </>
-                ) : (
-                  "Pull your GitHub activity and the board fills up."
+      <main className="min-w-0 flex-1 px-6 pb-24 pt-8 lg:pl-6 lg:pr-3 lg:pt-10">
+        <div className="w-full">
+          <div className="min-w-0 flex-1">
+            <section id="overview" className="scroll-mt-10">
+              <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-4">
+                  {user.image && (
+                    <Image
+                      src={user.image}
+                      alt=""
+                      width={56}
+                      height={56}
+                      className="h-12 w-12 shrink-0 rounded-full sm:h-14 sm:w-14"
+                    />
+                  )}
+                  <div>
+                    <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight text-brand-50 sm:text-4xl">
+                      Hi, <span className="italic">{firstName}!</span>
+                    </h1>
+                    <p className="mt-1 text-sm text-brand-300">
+                      {integration?.lastSyncedAt ? (
+                        <>
+                          Synced {timeAgo(integration.lastSyncedAt)}.{" "}
+                          {syncQuip(integration.lastSyncedAt)}
+                        </>
+                      ) : (
+                        "Pull your GitHub activity and the board fills up."
+                      )}
+                    </p>
+                  </div>
+                </div>
+                {/* The empty state below has its own sync button, so these only show once there's data. */}
+                {total > 0 && (
+                  <div className="flex shrink-0 items-start gap-2">
+                    <PeriodMenu
+                      options={periods.map(({ key, label }) => ({ key, label }))}
+                      current={period.key}
+                    />
+                    <SyncButton />
+                  </div>
                 )}
-              </p>
-            </div>
-            {/* The empty state below has its own sync button, so this only shows once there's data. */}
-            {total > 0 && (
-              <div className="shrink-0 self-start sm:self-auto">
-                <SyncButton />
               </div>
+
+              {integration?.status === "error" && (
+                <p
+                  role="alert"
+                  className="mt-8 rounded-xl border border-state-error/30 bg-state-error/10 px-4 py-3 text-sm text-state-error"
+                >
+                  The last sync didn&apos;t finish. Try again in a moment.
+                </p>
+              )}
+
+              {total > 0 && (
+                // Reads top-down: the number, then the roast in a quieter voice. The period is in the dropdown.
+                // The window's ink line sits beside it as the picture, not under it as a rule.
+                <div className="mt-12 grid gap-8 md:grid-cols-[minmax(0,24rem)_1fr] md:items-end md:gap-12">
+                  <div>
+                    <p className="flex items-baseline gap-2">
+                      <span className="font-heading text-6xl font-semibold leading-none tracking-tight text-brand-50 tabular-nums">
+                        {insights.total}
+                      </span>
+                      <span className="text-base text-brand-300">
+                        {insights.total === 1 ? "event" : "events"}
+                      </span>
+                    </p>
+                    <p className="mt-4 text-balance text-sm text-brand-300">
+                      {insights.roast}
+                    </p>
+                  </div>
+
+                  {insights.total > 0 && (
+                    <div aria-hidden className="text-brand-50">
+                      <InkCurve values={heroLine} width={300} height={60} className="h-24" />
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
+
+            {total === 0 ? (
+              <div className={`${card} mt-12 flex flex-col items-center p-8 text-center sm:p-12`}>
+                <span
+                  aria-hidden
+                  className="flex h-12 w-12 items-center justify-center rounded-xl border border-glass-border text-brand-100"
+                >
+                  <FiGithub className="h-6 w-6" strokeWidth={1.75} />
+                </span>
+                <h2 className="mt-5 text-lg font-semibold text-brand-50">Nothing synced yet</h2>
+                <p className="mt-2 max-w-sm leading-7 text-brand-300">
+                  Your commits, pull requests, issues, and reviews land here. GitHub keeps about
+                  90 days of activity, so the first sync covers roughly the last three months.
+                </p>
+                <div className="mt-7">
+                  <SyncButton label="Sync my activity" />
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="mt-10 grid gap-3 md:grid-cols-3">
+                  {stats.map((stat) => (
+                    <div key={stat.label} className={`${card} flex flex-col gap-6 p-5`}>
+                      <CardHeading icon={stat.icon} title={stat.label} aside={stat.badge} />
+                      <div className="flex items-end justify-between gap-4">
+                        <div>
+                          <p className="flex items-baseline gap-1.5">
+                            <span className="font-heading text-3xl font-semibold tracking-tight text-brand-50 tabular-nums">
+                              {stat.value}
+                            </span>
+                            {stat.unit && (
+                              <span className="text-xs text-brand-400">{stat.unit}</span>
+                            )}
+                          </p>
+                          <p className="mt-1 text-xs text-brand-400">{stat.note}</p>
+                        </div>
+                        <div aria-hidden>{stat.chart}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <section
+                  id="heatmap"
+                  aria-labelledby="heatmap-heading"
+                  className={`${card} mt-3 scroll-mt-10 p-5 sm:p-6`}
+                >
+                  <CardHeading id="heatmap-heading" icon={FiGrid} title="Contributions" meta="Past year" />
+                  <div className="mt-6">
+                    <ActivityHeatmap days={daily} />
+                  </div>
+                </section>
+
+                <section
+                  id="insights"
+                  aria-label="Insights"
+                  className="mt-3 grid scroll-mt-10 gap-3 md:grid-cols-2"
+                >
+                  <div className={`${card} flex flex-col gap-6 p-5 sm:p-6`}>
+                    <CardHeading icon={FiLayers} title="By type" meta={period.label} />
+                    <BarList rows={insights.byType} empty="No activity in this window." />
+                  </div>
+                  <div className={`${card} flex flex-col gap-6 p-5 sm:p-6`}>
+                    <CardHeading icon={FiFolder} title="Top repos" meta={period.label} />
+                    <BarList
+                      rows={insights.repos}
+                      total={insights.total}
+                      empty="No repos in this window."
+                    />
+                  </div>
+                </section>
+
+                <div id="hours" className="mt-3 scroll-mt-10">
+                  <CodingHours commitTimes={commitTimes} />
+                </div>
+
+                <p className="mt-4 text-xs text-brand-400">
+                  Contributions and streaks cover your full GitHub year. Everything else uses your
+                  public GitHub events from the last 90 days.
+                </p>
+              </>
             )}
           </div>
-
-          {integration?.status === "error" && (
-            <p
-              role="alert"
-              className="mt-8 rounded-xl border border-state-error/30 bg-state-error/10 px-4 py-3 text-sm text-state-error"
-            >
-              The last sync didn&apos;t finish. Try again in a moment.
-            </p>
-          )}
-
-          {total === 0 ? (
-            <div className={`${card} mt-12 flex flex-col items-center p-8 text-center sm:p-12`}>
-              <span
-                aria-hidden
-                className="flex h-12 w-12 items-center justify-center rounded-xl border border-glass-border text-brand-100"
-              >
-                <FiGithub className="h-6 w-6" strokeWidth={1.75} />
-              </span>
-              <h2 className="mt-5 text-lg font-semibold text-brand-50">
-                Nothing synced yet
-              </h2>
-              <p className="mt-2 max-w-sm leading-7 text-brand-300">
-                Your commits, pull requests, issues, and reviews land here.
-                GitHub keeps about 90 days of activity, so the first sync covers
-                roughly the last three months.
-              </p>
-              <div className="mt-7">
-                <SyncButton label="Sync my activity" />
-              </div>
-            </div>
-          ) : (
-            <>
-              <dl className="mt-12 grid gap-3 md:grid-cols-3">
-                {stats.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className={`${card} flex items-center justify-between gap-2 px-5 py-4 sm:flex-col sm:items-stretch sm:gap-1 sm:px-6`}
-                  >
-                    <dt className="text-sm text-brand-300 sm:text-xs sm:text-brand-400">
-                      {stat.label}
-                    </dt>
-                    <dd className="flex items-end justify-between gap-4">
-                      <span className="flex items-baseline gap-1.5">
-                        <span className="font-heading text-2xl font-semibold tracking-tight text-brand-50 tabular-nums sm:text-3xl">
-                          {stat.value}
-                        </span>
-                        {stat.unit && (
-                          <span className="text-xs text-brand-400">{stat.unit}</span>
-                        )}
-                      </span>
-                      <span aria-hidden className="hidden sm:block">
-                        {stat.chart}
-                      </span>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-
-              <div className="mt-12">
-                <ActivityHeatmap days={daily} />
-              </div>
-
-              <section className={`${card} mt-12 p-5 sm:p-6`}>
-                <h2 className="text-sm font-medium text-brand-50">
-                  Recent activity
-                </h2>
-
-                <ul className="mt-2 flex flex-col divide-y divide-glass-border">
-                  {recent.map((event) => {
-                    const Icon = eventIcon[event.type];
-
-                    return (
-                      <li key={event.id}>
-                        <a
-                          href={event.url ?? "#"}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-brand-800/60 focus-visible:outline-2 focus-visible:outline-accent-primary light:hover:bg-brand-900/60"
-                        >
-                          <span
-                            aria-hidden
-                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-glass-border text-brand-300"
-                          >
-                            <Icon className="h-4 w-4" strokeWidth={1.75} />
-                          </span>
-                          <span className="truncate text-sm text-brand-100">
-                            <span className="sr-only">
-                              {eventLabel[event.type]}:{" "}
-                            </span>
-                            {event.title ?? eventLabel[event.type]}
-                          </span>
-                          <span className="ml-auto hidden shrink-0 font-mono text-xs text-brand-400 sm:inline">
-                            {event.project}
-                          </span>
-                          <span className="shrink-0 text-xs text-brand-400 tabular-nums">
-                            {timeAgo(event.occurredAt)}
-                          </span>
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            </>
-          )}
         </div>
       </main>
-    </>
+    </div>
   );
 }

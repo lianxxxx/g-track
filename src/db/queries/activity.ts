@@ -181,7 +181,10 @@ export async function storeContributionDays(
 /** The heatmap window: 52 weeks plus the current partial week. */
 const HEATMAP_DAYS = 371;
 
-/** Everything the dashboard board renders: totals, sync state, recent events. */
+/** How far back the Events API reaches, so the insights window never claims more. */
+export const INSIGHTS_DAYS = 90;
+
+/** Everything the dashboard board renders: totals, sync state, the heatmap year, and the 90-day event window. */
 export async function getActivityOverview(userId: string) {
   const [integration] = await db
     .select({
@@ -194,21 +197,6 @@ export async function getActivityOverview(userId: string) {
       and(eq(integrations.userId, userId), eq(integrations.source, "github")),
     )
     .limit(1);
-
-  const recent = await db
-    .select({
-      id: activityEvents.id,
-      type: activityEvents.type,
-      title: activityEvents.title,
-      url: activityEvents.url,
-      occurredAt: activityEvents.occurredAt,
-      project: projects.name,
-    })
-    .from(activityEvents)
-    .innerJoin(projects, eq(activityEvents.projectId, projects.id))
-    .where(eq(activityEvents.userId, userId))
-    .orderBy(desc(activityEvents.occurredAt))
-    .limit(8);
 
   // Heatmap and stats come from the contribution calendar: a full year,
   // private contributions included, matching the user's GitHub profile.
@@ -225,10 +213,35 @@ export async function getActivityOverview(userId: string) {
       ),
     );
 
+  // Insights, coding hours, and the activity panel: every event in the window,
+  // newest first. 90 days of one person's activity is a few hundred rows, small
+  // enough to summarize in the page.
+  const windowed = await db
+    .select({
+      id: activityEvents.id,
+      type: activityEvents.type,
+      title: activityEvents.title,
+      url: activityEvents.url,
+      occurredAt: activityEvents.occurredAt,
+      project: projects.name,
+    })
+    .from(activityEvents)
+    .innerJoin(projects, eq(activityEvents.projectId, projects.id))
+    .where(
+      and(
+        eq(activityEvents.userId, userId),
+        gte(
+          activityEvents.occurredAt,
+          new Date(Date.now() - INSIGHTS_DAYS * 86_400_000),
+        ),
+      ),
+    )
+    .orderBy(desc(activityEvents.occurredAt));
+
   return {
     integration: integration ?? null,
     total: daily.reduce((sum, row) => sum + row.count, 0),
-    recent,
     daily,
+    windowed,
   };
 }

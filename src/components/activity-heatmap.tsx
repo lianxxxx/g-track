@@ -1,4 +1,4 @@
-import { squareColor } from "@/components/contribution-graph";
+import { inkCell } from "@/components/stat-charts";
 
 const WEEKS = 52;
 const DAYS = 7;
@@ -98,7 +98,7 @@ export function ActivityHeatmap({ days }: Props) {
                   ? undefined
                   : `${cell.count} ${cell.count === 1 ? "event" : "events"} on ${dayFormat.format(cell.date)}`
               }
-              className={`aspect-square rounded-[2px] sm:rounded-[3px] ${cell.future ? "" : squareColor[levelOf(cell.count)]}`}
+              className={`aspect-square rounded-[2px] sm:rounded-[3px] ${cell.future ? "" : inkCell[levelOf(cell.count)]}`}
             />
           ))}
         </div>
@@ -106,7 +106,7 @@ export function ActivityHeatmap({ days }: Props) {
 
       <div className="mt-4 hidden items-center justify-end gap-1.5 sm:flex">
         <span className="mr-1 text-xs text-brand-400">Less</span>
-        {squareColor.map((color) => (
+        {inkCell.map((color) => (
           <span key={color} className={`h-2.5 w-2.5 rounded-[3px] ${color}`} />
         ))}
         <span className="ml-1 text-xs text-brand-400">More</span>

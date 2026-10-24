@@ -9,6 +9,7 @@ import {
 } from "react-icons/fi";
 
 import { Recap } from "@/components/preview/insights-view";
+import { InkCurve, inkHatch } from "@/components/stat-charts";
 
 /* Relative commit volume per weekday, Monday first; Thursday is the peak. */
 const weekdayTotals = [45, 60, 50, 100, 70, 20, 15];
@@ -37,8 +38,6 @@ const card = "rounded-card border border-glass-border";
 /* Same icon tile as How it works: small rounded square, hairline border, muted icon. */
 const iconTile =
   "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-glass-border text-brand-300";
-const inkHatch =
-  "bg-[repeating-linear-gradient(135deg,var(--brand-50)_0_1.5px,transparent_1.5px_6px)]";
 
 /* Bare trend arrow: same icon rules as the tiles, without the square. */
 function ArrowChip() {
@@ -175,51 +174,12 @@ function StreakTile() {
 }
 
 function BusiestDayTile() {
-  const peak = Math.max(...weekdayTotals);
-  const peakIndex = weekdayTotals.indexOf(peak);
-  const points = weekdayTotals.map((total, index) => ({
-    x: (index / (weekdayTotals.length - 1)) * 150,
-    y: 60 - (total / peak) * 48,
-  }));
-  /* Smooth curve through the points (Catmull-Rom turned into cubic Béziers). */
-  const line = points.reduce((path, current, index) => {
-    if (index === 0) return `M ${current.x} ${current.y}`;
-    const p0 = points[index - 2] ?? points[index - 1];
-    const p1 = points[index - 1];
-    const p2 = current;
-    const p3 = points[index + 1] ?? current;
-    const c1x = (p1.x + (p2.x - p0.x) / 6).toFixed(2);
-    const c1y = (p1.y + (p2.y - p0.y) / 6).toFixed(2);
-    const c2x = (p2.x - (p3.x - p1.x) / 6).toFixed(2);
-    const c2y = (p2.y - (p3.y - p1.y) / 6).toFixed(2);
-    return `${path} C ${c1x} ${c1y} ${c2x} ${c2y} ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
-  }, "");
-  const top = points[peakIndex];
-  const end = points[points.length - 1];
-  /* Arrowhead follows the curve's final direction: two 7-unit wings, 28° either side of it. */
-  const before = points[points.length - 2];
-  const heading = Math.atan2(end.y - before.y, end.x - before.x);
-  const wing = (offset: number) =>
-    `${(end.x - Math.cos(heading + offset) * 7).toFixed(2)} ${(end.y - Math.sin(heading + offset) * 7).toFixed(2)}`;
-  const arrow = `M ${wing(0.5)} L ${end.x.toFixed(2)} ${end.y.toFixed(2)} L ${wing(-0.5)}`;
-
   return (
     <div className="flex flex-col gap-4 px-1 pt-2 text-brand-50">
       <p className="text-sm font-medium opacity-75">Busiest day</p>
       <p className="font-heading text-xl font-semibold">Thursday</p>
       {/* Ink curve with a dot on the peak and an arrow where the week trails off. */}
-      <svg viewBox="-6 0 170 70" className="w-full overflow-visible">
-        <path d={line} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
-        <path
-          d={arrow}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <circle cx={top.x} cy={top.y} r={4} className="fill-page" stroke="currentColor" strokeWidth={2} />
-      </svg>
+      <InkCurve values={weekdayTotals} arrow />
     </div>
   );
 }

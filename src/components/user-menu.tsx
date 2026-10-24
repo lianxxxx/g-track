@@ -11,13 +11,17 @@ type Props = {
   name: string;
   email: string;
   image: string | null;
+  /** "below": name pill in a header, dropdown underneath. "side": avatar only at the foot of the
+   *  icon rail, dropdown opening to its right. */
+  placement?: "below" | "side";
 };
 
 /** Avatar trigger with the account actions tucked into a dropdown, so the
  *  header stays down to a theme toggle and one control. */
-export function UserMenu({ name, email, image }: Props) {
+export function UserMenu({ name, email, image, placement = "below" }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const isSide = placement === "side";
   const [pending, setPending] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -60,7 +64,7 @@ export function UserMenu({ name, email, image }: Props) {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="flex h-10 items-center gap-2 rounded-full border border-glass-border bg-glass py-1 pl-1 pr-3 transition-colors hover:border-brand-600 focus-visible:outline-2 focus-visible:outline-accent-primary"
+        className={`flex h-10 items-center gap-2 rounded-full border border-glass-border bg-glass py-1 transition-colors ${isSide ? "px-1" : "pl-1 pr-3"} hover:border-brand-600 focus-visible:outline-2 focus-visible:outline-accent-primary`}
       >
         {image ? (
           <Image
@@ -78,13 +82,19 @@ export function UserMenu({ name, email, image }: Props) {
             {name.charAt(0).toUpperCase()}
           </span>
         )}
-        <span className="hidden text-sm text-brand-100 sm:inline">{name}</span>
-        {/* The name carries the accessible name from sm up; below that it is display:none. */}
-        <span className="sr-only sm:hidden">Account menu</span>
+        {isSide ? (
+          <span className="sr-only">Account menu</span>
+        ) : (
+          <>
+            <span className="hidden text-sm text-brand-100 sm:inline">{name}</span>
+            {/* The name carries the accessible name from sm up; below that it is display:none. */}
+            <span className="sr-only sm:hidden">Account menu</span>
+          </>
+        )}
         <FiChevronDown
           className={`h-4 w-4 shrink-0 text-brand-300 transition-transform ${
             open ? "rotate-180" : ""
-          }`}
+          } ${isSide ? "hidden" : ""}`}
           strokeWidth={1.75}
           aria-hidden
         />
@@ -94,7 +104,7 @@ export function UserMenu({ name, email, image }: Props) {
         <div
           role="menu"
           aria-label="Account"
-          className="absolute right-0 top-12 z-50 w-56 rounded-card border border-glass-border bg-brand-900 p-2 light:bg-brand-950"
+          className={`absolute z-50 ${isSide ? "bottom-0 left-full ml-3 w-56" : "right-0 top-12 w-56"} rounded-card border border-glass-border bg-brand-900 p-2 light:bg-brand-950`}
         >
           <div className="border-b border-glass-border px-3 pb-3 pt-2">
             <p className="truncate text-sm font-medium text-brand-50">{name}</p>
