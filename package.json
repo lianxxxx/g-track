@@ -39,6 +39,8 @@
     "typescript": "^5"
   },
   "overrides": {
-    "@esbuild-kit/core-utils": {}
+  "drizzle-kit": {
+    "@esbuild-kit/esm-loader": "npm:tsx@^4.23.12"
   }
+}
 }
