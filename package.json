@@ -34,13 +34,13 @@
     "babel-plugin-react-compiler": "1.0.0",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
-    "eslint-config-next": "16.3.2",
+    "eslint-config-next": "16.4.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
   "overrides": {
-  "drizzle-kit": {
-    "@esbuild-kit/esm-loader": "npm:tsx@^4.23.12"
+    "drizzle-kit": {
+      "@esbuild-kit/esm-loader": "npm:tsx@^4.23.12"
+    }
   }
-}
 }
